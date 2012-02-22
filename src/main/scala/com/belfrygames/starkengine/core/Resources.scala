@@ -1,0 +1,43 @@
+package com.belfrygames.starkengine.core
+
+import com.badlogic.gdx.Gdx
+import com.badlogic.gdx.graphics.Texture
+import com.badlogic.gdx.graphics.g2d.TextureRegion
+
+trait Resources {
+  def initialize()
+  
+  def load(name : String, width: Int = -1, height: Int = -1, x: Int = 0, y: Int = 0) : TextureRegion = {
+    val texture = new Texture(Gdx.files.internal(name))
+    if (width < 0 || height < 0) {
+      new TextureRegion(texture, x, y, texture.getWidth, texture.getHeight)
+    } else {
+      new TextureRegion(texture, x, y, width, height)
+    }
+  }
+  
+  def split(name: String, width: Int, height: Int, margin: Int, spacing: Int, flipX: Boolean, flipY: Boolean) : Array[Array[TextureRegion]] = {
+    def indexToPos(x: Int, y: Int) : Tuple2[Int, Int] = {
+        (margin + (width + spacing) * x, margin + (height + spacing) * y)
+    }
+    
+    val texture = new Texture(Gdx.files.internal(name))
+    val xSlices = texture.getWidth() / width
+    val ySlices = texture.getHeight() / height
+    val res = Array.ofDim[TextureRegion](ySlices, xSlices)
+    for (x <- 0 until xSlices; y <- 0 until ySlices) {
+      val coords = indexToPos(x, y)
+      res(y)(x) = new TextureRegion(texture, coords._1, coords._2, width, height)
+      res(y)(x).flip(flipX, flipY)
+    }
+    
+    res
+  }
+  
+  val map = collection.mutable.Map[String, TextureRegion]()
+  def set(id: String, texture: TextureRegion) {
+    map.put(id, texture)
+  }
+  
+  def get(id: String) = map(id)
+}
