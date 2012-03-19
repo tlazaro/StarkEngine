@@ -18,7 +18,7 @@ object ProjectDefinition extends Build {
       else                                   Some("release"  at cloudbees + "release/")
     },
     credentials += {
-      val credsFile = (Path.userHome / ".credentials")
+      val credsFile = (Path.userHome / ".ivy2" / ".credentials")
       (if (credsFile.exists) Credentials(credsFile)
        else Credentials(file("/private/belfry/.credentials/.credentials")))
     }
