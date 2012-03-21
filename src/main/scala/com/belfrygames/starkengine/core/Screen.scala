@@ -77,9 +77,17 @@ class Screen extends DrawableParent with UpdateableParent with Timed {
   var targetWidth = 0
   var targetHeight = 0
   
+  def screenToViewPortX(x: Float) = {
+    (x - (Gdx.graphics.getWidth - targetWidth) / 2) * (Gdx.graphics.getWidth.toFloat / targetWidth.toFloat)
+  }
+  
+  def screenToViewPortY(y: Float) = {
+    (y - (Gdx.graphics.getHeight - targetHeight) / 2) * (Gdx.graphics.getHeight.toFloat / targetHeight.toFloat)
+  }
+  
   def pick(x: Int, y: Int) = {
-    tmp.x = x
-    tmp.y = y
+    tmp.x = screenToViewPortX(x)
+    tmp.y = screenToViewPortY(y)
     tmp.z = 0
     cam.unproject(tmp)
     
@@ -108,7 +116,7 @@ class Screen extends DrawableParent with UpdateableParent with Timed {
       spriteBatch.begin()
       if (SHOW_KEYS) {
         for ((text, line) <- keys) {
-          font.draw(spriteBatch, text, 20, app.config.height - ((line + 1) * 20))
+          font.draw(spriteBatch, text, 20, Gdx.graphics.getHeight - ((line + 2) * 20))
         }
       }
       if (DEBUG) {

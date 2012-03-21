@@ -18,8 +18,8 @@ class StarkApp(val config: Config) extends ApplicationListener with Updateable w
   private[this] var targetHeight = 0
   private[this] var _screen: Screen = _
   
-  val inputs = new InputMultiplexer()
-  val res = config.resources
+  lazy val inputs = new InputMultiplexer()
+  lazy val res = config.resources
   
   def screen = _screen
   def screen_=(value: Screen) = {
@@ -30,6 +30,8 @@ class StarkApp(val config: Config) extends ApplicationListener with Updateable w
   protected[this] val timer = new StopWatch
   
   def create() {
+    Gdx.app.log("StarkApp", "Created Stark App")
+    
     Gdx.input.setInputProcessor(inputs)
     inputs.addProcessor(new DebugKeysController(this))
     
@@ -72,10 +74,14 @@ class StarkApp(val config: Config) extends ApplicationListener with Updateable w
   }
   
   def pause() {
+    Gdx.app.log("StarkApp", "Paused Stark App")
+    
     screen.pause()
   }
   
   def dispose() {
+    Gdx.app.log("StarkApp", "Disposed Stark App")
+    
     screen.dispose()
   }
 }

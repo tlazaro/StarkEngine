@@ -77,8 +77,8 @@ class ScreenTest extends Screen {
     
     private[this] val tmp = new Vector3
     override def touchMoved(x: Int, y: Int) = {
-      tmp.x = x
-      tmp.y = y
+      tmp.x = screenToViewPortX(x)
+      tmp.y = screenToViewPortY(y)
       tmp.z = 0
       cam.unproject(tmp)
       cursor.x = tmp.x

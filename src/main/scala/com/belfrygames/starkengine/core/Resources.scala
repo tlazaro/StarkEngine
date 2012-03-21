@@ -1,14 +1,26 @@
 package com.belfrygames.starkengine.core
 
 import com.badlogic.gdx.Gdx
+import com.badlogic.gdx.files.FileHandle
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.TextureRegion
+import java.io.File
 
 trait Resources {
   def initialize()
   
+  def loadWithFile(file : File, width: Int = -1, height: Int = -1, x: Int = 0, y: Int = 0) : TextureRegion = {
+    loadWithFileHandle(new FileHandle(file), width, height, x, y)
+  }
+  
   def load(name : String, width: Int = -1, height: Int = -1, x: Int = 0, y: Int = 0) : TextureRegion = {
-    val texture = new Texture(Gdx.files.internal(name))
+    loadWithFileHandle(Gdx.files.internal(name), width, height, x, y)
+  }
+  
+  def loadWithFileHandle(file : FileHandle, width: Int = -1, height: Int = -1, x: Int = 0, y: Int = 0) : TextureRegion = {
+    Gdx.app.log("Resources", "Loading: " + file)
+                
+    val texture = new Texture(file)
     if (width < 0 || height < 0) {
       new TextureRegion(texture, x, y, texture.getWidth, texture.getHeight)
     } else {
@@ -21,7 +33,9 @@ trait Resources {
         (margin + (width + spacing) * x, margin + (height + spacing) * y)
     }
     
-    val texture = new Texture(Gdx.files.internal(name))
+    Gdx.app.log("Resources", "Splitting: " + name)
+    
+    val texture = new Texture(Gdx.files.classpath(name))
     val xSlices = texture.getWidth() / width
     val ySlices = texture.getHeight() / height
     val res = Array.ofDim[TextureRegion](ySlices, xSlices)
