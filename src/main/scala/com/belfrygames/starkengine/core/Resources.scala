@@ -35,9 +35,17 @@ trait Resources {
     
     Gdx.app.log("Resources", "Splitting: " + name)
     
-    val texture = new Texture(Gdx.files.classpath(name))
-    val xSlices = texture.getWidth() / width
-    val ySlices = texture.getHeight() / height
+    val texture = new Texture(Gdx.files.internal(name))
+    
+    val xSlices = texture.getWidth match {
+      case n if n >= margin * 2 + width => 1 + (n - margin * 2 - width) / (width + spacing)
+      case _ => 0
+    }
+    val ySlices = texture.getHeight match {
+      case n if n >= margin * 2 + height => 1 + (n - margin * 2 - height) / (height + spacing)
+      case _ => 0
+    }
+    
     val res = Array.ofDim[TextureRegion](ySlices, xSlices)
     for (x <- 0 until xSlices; y <- 0 until ySlices) {
       val coords = indexToPos(x, y)
