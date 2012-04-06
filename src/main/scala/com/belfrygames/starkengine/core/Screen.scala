@@ -85,11 +85,17 @@ class Screen extends DrawableParent with UpdateableParent with Timed {
     (y - (Gdx.graphics.getHeight - targetHeight) / 2) * (Gdx.graphics.getHeight.toFloat / targetHeight.toFloat)
   }
   
+  def screenToCanvas(x: Int, y: Int, result: Vector3 = null): Vector3 = {
+    val vec = if (result == null) new Vector3 else result
+    vec.x = screenToViewPortX(x)
+    vec.y = screenToViewPortY(y)
+    vec.z = 0
+    cam.unproject(vec)
+    vec
+  }
+  
   def pick(x: Int, y: Int) = {
-    tmp.x = screenToViewPortX(x)
-    tmp.y = screenToViewPortY(y)
-    tmp.z = 0
-    cam.unproject(tmp)
+    screenToCanvas(x, y, tmp)
     
     for(d <- regularCam.drawables) {
       d match {
@@ -146,6 +152,21 @@ class Screen extends DrawableParent with UpdateableParent with Timed {
   def resize(width : Int, height : Int) {
     targetWidth = width
     targetHeight = height
+    
+    app.resizePolicy match {
+      case OriginalCanvas => {
+          cam.viewportWidth = targetWidth
+          cam.viewportHeight = targetHeight
+          hudCam.cam.viewportWidth = targetWidth
+          hudCam.cam.viewportHeight = targetHeight
+        }
+      case _ => {
+          cam.viewportWidth = app.config.width
+          cam.viewportHeight = app.config.height
+          hudCam.cam.viewportWidth = app.config.width
+          hudCam.cam.viewportHeight = app.config.height
+        }
+    }
   }
   
   def pause( ) { }

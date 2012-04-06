@@ -3,6 +3,7 @@ package com.belfrygames.starkengine.core
 import com.badlogic.gdx.ApplicationListener
 import com.belfrygames.starkengine.utils.StopWatch
 import com.badlogic.gdx.Gdx
+import com.badlogic.gdx.Input
 import com.badlogic.gdx.InputAdapter
 import com.badlogic.gdx.InputMultiplexer
 import com.belfrygames.starkengine.tags._
@@ -11,6 +12,7 @@ sealed trait ResizePolicy
 case object FitScreen extends ResizePolicy
 case object Stretch extends ResizePolicy
 case object Original extends ResizePolicy
+case object OriginalCanvas extends ResizePolicy
 
 class StarkApp(val config: Config) extends ApplicationListener with Updateable with Timed {
   var resizePolicy: ResizePolicy = FitScreen
@@ -66,6 +68,7 @@ class StarkApp(val config: Config) extends ApplicationListener with Updateable w
         }
       case Stretch => (width, height)
       case Original => (config.width, config.height)
+      case OriginalCanvas => (width, height)
     }
     targetWidth = tWidth
     targetHeight = tHeight
@@ -116,11 +119,14 @@ class DebugKeysController(app: StarkApp) extends InputAdapter {
   }
   
   override def touchDragged(x: Int, y: Int, pointer: Int): Boolean = {
-    val pos = app.screen.regularCam.cam.position
-    pos.x -= x - oldX
-    pos.y += y - oldY
-    oldX = x
-    oldY = y
+    if (Gdx.input.isButtonPressed(Input.Buttons.RIGHT)) {
+      val pos = app.screen.regularCam.cam.position
+      pos.x -= x - oldX
+      pos.y += y - oldY
+      oldX = x
+      oldY = y
+    }
+    
     false
   }
 }
