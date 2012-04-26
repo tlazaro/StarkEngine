@@ -30,9 +30,9 @@ class StarkAppTest extends FunSuite {
     
     val resources = new Resources() {
       def initialize() {
-        set("eddard", load("com/belfrygames/starkengine/eddard.png"))
-        set("cursor", load("com/belfrygames/starkengine/cursor.png"))
-        set("death", load("com/belfrygames/starkengine/death.png"))
+        set("eddard", Resources.load("com/belfrygames/starkengine/eddard.png"))
+        set("cursor", Resources.load("com/belfrygames/starkengine/cursor.png"))
+        set("death", Resources.load("com/belfrygames/starkengine/death.png"))
       }
     }
     

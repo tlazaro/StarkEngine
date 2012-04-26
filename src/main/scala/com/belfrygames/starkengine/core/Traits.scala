@@ -130,7 +130,7 @@ trait UpdateableParent extends Updateable {
         val (prefix, suffix) = updateables splitAt n
         updateables = prefix ++ suffix.tail
       }
-      case _ => error("Child does not exist:" + child)
+      case _ => sys.error("Child does not exist:" + child)
     }
   }
   
@@ -157,7 +157,7 @@ trait DrawableParent extends Drawable {
         val (prefix, suffix) = drawables splitAt n
         drawables = prefix ++ suffix.tail
       }
-      case _ => error("Child does not exist:" + child)
+      case _ => sys.error("Child does not exist:" + child)
     }
   }
   

@@ -17,7 +17,7 @@ object Screen {
   var SHOW_KEYS = true
 }
 
-class Screen extends DrawableParent with UpdateableParent with Timed {
+class Screen extends Node with Timed {
   import Screen._
   
   var app: StarkApp = _
@@ -40,16 +40,6 @@ class Screen extends DrawableParent with UpdateableParent with Timed {
   
   private lazy val debugRenderer = new ShapeRenderer()
   
-  def addSprite(sprite: Sprite) {
-    regularCam.addDrawable(sprite)
-    addUpdateable(sprite)
-  }
-  
-  def removeSprite(sprite: Sprite) {
-    regularCam.removeDrawable(sprite)
-    removeUpdateable(sprite)
-  }
-  
   def register() {
   }
   
@@ -59,15 +49,9 @@ class Screen extends DrawableParent with UpdateableParent with Timed {
   def create(app: StarkApp) {
     this.app = app
     
-    addUpdateable(followCam)
-    
     cam.position.set(0, 0, 0)
     followCam.update(tag(0))
     hudCam.cam.position.set(0, 0, 0)
-    
-    addDrawable(specialCam)
-    addDrawable(regularCam)
-    addDrawable(hudCam)
   }
   
   val tmp = new Vector3()
@@ -110,9 +94,15 @@ class Screen extends DrawableParent with UpdateableParent with Timed {
     
     Gdx.gl.glViewport((Gdx.graphics.getWidth - targetWidth) / 2, (Gdx.graphics.getHeight - targetHeight) / 2, targetWidth, targetHeight)
     
+    val m = spriteBatch.getProjectionMatrix.cpy
+    spriteBatch.setProjectionMatrix(cam.combined)
+    spriteBatch.begin()
     draw(spriteBatch)
+    spriteBatch.end()
+    spriteBatch.setProjectionMatrix(m)
+    
     if (Screen.DEBUG) {
-      debugRenderer.setProjectionMatrix(cam.combined.cpy);
+      debugRenderer.setProjectionMatrix(cam.combined)
       debugDraw(debugRenderer)
     }
     
