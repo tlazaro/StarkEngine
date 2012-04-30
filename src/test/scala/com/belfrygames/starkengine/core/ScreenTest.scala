@@ -27,7 +27,7 @@ class ScreenTest extends Screen {
     
     Screen.DEBUG = true
     
-    add(node, "node")
+    foreground.add(node, "node")
     
     val a = Sprite(app.res.get("eddard"))
     node.add(a, "a")
@@ -45,7 +45,7 @@ class ScreenTest extends Screen {
 //    addSprite(ed3)
 //    addSprite(ed4)
 //    
-    add(cursor, "cursor")
+    foreground.add(cursor, "cursor")
     
     cursor.setOrigin(0.5f, 0.5f)
     

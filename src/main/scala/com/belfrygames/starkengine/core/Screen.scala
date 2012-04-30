@@ -40,6 +40,12 @@ class Screen extends Node with Timed {
   
   private lazy val debugRenderer = new ShapeRenderer()
   
+  lazy val foreground = new Layer(cam)
+  lazy val hud: Layer = new Layer(new OrthographicCamera(app.config.width, app.config.height)){
+    cam.position.set(app.config.width / 2, app.config.height / 2, 0)
+    cam.update()
+  }
+  
   def register() {
   }
   
@@ -48,6 +54,9 @@ class Screen extends Node with Timed {
   
   def create(app: StarkApp) {
     this.app = app
+    
+    add(foreground, "foreground")
+    add(hud, "hud")
     
     cam.position.set(0, 0, 0)
     followCam.update(tag(0))
@@ -94,15 +103,11 @@ class Screen extends Node with Timed {
     
     Gdx.gl.glViewport((Gdx.graphics.getWidth - targetWidth) / 2, (Gdx.graphics.getHeight - targetHeight) / 2, targetWidth, targetHeight)
     
-    val m = spriteBatch.getProjectionMatrix.cpy
-    spriteBatch.setProjectionMatrix(cam.combined)
     spriteBatch.begin()
     draw(spriteBatch)
     spriteBatch.end()
-    spriteBatch.setProjectionMatrix(m)
     
     if (Screen.DEBUG) {
-      debugRenderer.setProjectionMatrix(cam.combined)
       debugDraw(debugRenderer)
     }
     
