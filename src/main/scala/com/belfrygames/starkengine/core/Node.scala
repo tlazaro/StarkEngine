@@ -21,11 +21,19 @@ object Node {
 /** Node is the basic element to build from that can be displayed and updated on the screen */
 trait Node extends Drawable with Updateable with Particle with Spatial {
   var parent: Option[Node] = None
-  private var children = Map[String, Node]()
+  private var children = Vector[(String, Node)]()
   
   var graphic : Graphic[_] = null
   def width = if (graphic != null) graphic.width else -1
   def height = if (graphic != null) graphic.height else -1
+  
+  /** Returns the top most Node. It may return 'this' if it has no parent */
+  def root: Node = {
+    parent match {
+      case Some(p) => p.root
+      case _ => this
+    }
+  }
   
   def setOrigin(xRatio: Float, yRatio: Float) {
     originfX = xRatio
@@ -64,20 +72,22 @@ trait Node extends Drawable with Updateable with Particle with Spatial {
   
   /** Adds a Node to be rendered and updated */
   final def add[T<:Node](child: T, name: String): T = synchronized {
-    children = children + ((name, child))
+    children = children :+ ((name, child))
     child.parent = Some(this)
     child
   }
   
   /** Removes a Node by name */
   final def remove(name : String): Option[Node] = synchronized {
-    if (children.contains(name)) {
-      val child = children(name)
-      child.parent = None
-      children = children - name
-      Some(child)
-    } else {
-      None
+    children.indexWhere(_._1 == name) match {
+      case n if n >= 0 => {
+          val child = children(n)._2
+          child.parent = None
+          val (prefix, suffix) = children splitAt n
+          children = prefix ++ suffix.tail
+          Some(child)
+        }
+      case _ => None
     }
   }
   
@@ -90,7 +100,7 @@ trait Node extends Drawable with Updateable with Particle with Spatial {
   }
   
   /** Find a child by name */
-  final def get(child: String): Option[Node] = if (children.contains(child)) Some(children(child)) else None
+  final def get(child: String): Option[Node] = children.find(_._1 == child).map(_._2)
   
   private var _matrix: Matrix4 = null
   final def matrix(): Matrix4 = {
@@ -122,7 +132,7 @@ trait Node extends Drawable with Updateable with Particle with Spatial {
       trans.mul(matrix)
       spriteBatch.setTransformMatrix(trans)
 
-      children.values foreach (_ redraw spriteBatch)
+      children foreach (_._2 redraw spriteBatch)
 
       spriteBatch.setTransformMatrix(oldTrans)
       Node.matrixes.free(oldTrans)
@@ -130,7 +140,7 @@ trait Node extends Drawable with Updateable with Particle with Spatial {
   }
   
   final protected def debugDrawChildren(renderer: ShapeRenderer) = {
-    children.values foreach (_ debugRedraw renderer)
+    children foreach (_._2 debugRedraw renderer)
   }
   
   /** Draws this node and it's children */
@@ -195,7 +205,7 @@ trait Node extends Drawable with Updateable with Particle with Spatial {
     debugDrawChildren(renderer)
   }
   
-  final protected def updateChildren(elapsed : Long @@ Milliseconds) { children.values foreach (_ update elapsed) }
+  final protected def updateChildren(elapsed : Long @@ Milliseconds) { children foreach (_._2 update elapsed) }
   
   /** Updates this node and it's children */
   override def update(elapsed : Long @@ Milliseconds) { updateChildren(elapsed) }
