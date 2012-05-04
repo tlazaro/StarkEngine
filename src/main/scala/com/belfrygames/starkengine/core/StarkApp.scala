@@ -6,6 +6,10 @@ import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Input
 import com.badlogic.gdx.InputAdapter
 import com.badlogic.gdx.InputMultiplexer
+import com.badlogic.gdx.assets.AssetManager
+import com.badlogic.gdx.assets.loaders.TextureLoader
+import com.badlogic.gdx.assets.loaders.resolvers.InternalFileHandleResolver
+import com.badlogic.gdx.graphics.Texture
 import com.belfrygames.starkengine.tags._
 
 sealed trait ResizePolicy
@@ -14,7 +18,27 @@ case object Stretch extends ResizePolicy
 case object Original extends ResizePolicy
 case object OriginalCanvas extends ResizePolicy
 
-class StarkApp(val config: Config) extends ApplicationListener with Updateable with Timed {
+object StarkApp {
+  var app: StarkApp = null
+  
+  /** Preparing for multi canvas a Context will allow to set all the global variables */
+  case class Context(app: StarkApp)
+  
+  def setContext(ctx: Context) {
+    app = ctx.app
+  }
+  
+  def getContext(ctx: Context) = {
+    Context(app)
+  }
+  
+  def apply(config: Config) = {
+    app = new StarkApp(config)
+    app
+  }
+}
+
+class StarkApp private(val config: Config) extends ApplicationListener with Updateable with Timed {
   var resizePolicy: ResizePolicy = FitScreen
   private[this] var targetWidth = 0
   private[this] var targetHeight = 0
@@ -30,6 +54,9 @@ class StarkApp(val config: Config) extends ApplicationListener with Updateable w
   }
   
   protected[this] val timer = new StopWatch
+  
+  val manager = new AssetManager
+  manager.setLoader(classOf[Texture], new TextureLoader(new InternalFileHandleResolver()))
   
   def create() {
     Gdx.app.log("StarkApp", "Created Stark App")
@@ -120,7 +147,7 @@ class DebugKeysController(app: StarkApp) extends InputAdapter {
   
   override def touchDragged(x: Int, y: Int, pointer: Int): Boolean = {
     if (Gdx.input.isButtonPressed(Input.Buttons.RIGHT)) {
-      val pos = app.screen.regularCam.cam.position
+      val pos = app.screen.cam.position
       pos.x -= x - oldX
       pos.y += y - oldY
       oldX = x

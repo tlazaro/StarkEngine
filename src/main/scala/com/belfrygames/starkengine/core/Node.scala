@@ -102,6 +102,8 @@ trait Node extends Drawable with Updateable with Particle with Spatial {
   /** Find a child by name */
   final def get(child: String): Option[Node] = children.find(_._1 == child).map(_._2)
   
+  final def getChildren() = children.map(_._2)
+  
   private var _matrix: Matrix4 = null
   final def matrix(): Matrix4 = {
     if (_matrix == null) {

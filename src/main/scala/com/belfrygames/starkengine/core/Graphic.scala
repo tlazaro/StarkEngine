@@ -16,8 +16,7 @@ object Graphic {
 /** It wraps a visual primitive like a Texture a or TextureRegion */
 trait Graphic[T <: AnyRef] {
   var primitive: T
-  def draw(spriteBatch: SpriteBatch, x: Float, y: Float, centerX: Float, centerY: Float,
-           width: Float, height: Float, scaleX: Float, scaleY: Float, rotation: Float)
+  def draw(spriteBatch: SpriteBatch, x: Float, y: Float, centerX: Float = 0, centerY: Float = 0, width: Float = width, height: Float = height, scaleX: Float = 1.0f, scaleY: Float = 1.0f, rotation: Float = 0)
   
   def width: Float
   def height: Float

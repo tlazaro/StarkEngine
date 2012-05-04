@@ -17,7 +17,7 @@ class Layer(val cam: Camera) extends Node {
   }
   
   override def debugDraw(renderer: ShapeRenderer) {
-    renderer.setProjectionMatrix(cam.combined)
+    renderer.setProjectionMatrix(cam.combined.cpy)
     super.debugDraw(renderer)
   }
 }

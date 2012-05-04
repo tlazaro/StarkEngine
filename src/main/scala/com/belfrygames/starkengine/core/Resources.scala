@@ -8,7 +8,7 @@ import java.io.File
 
 object Resources {
   def loadWithFileHandle(file : FileHandle, width: Int = -1, height: Int = -1, x: Int = 0, y: Int = 0) : TextureRegion = {
-    val texture = new Texture(file)
+    val texture = StarkApp.app.manager.get(file.path, classOf[Texture])
     if (width < 0 || height < 0) {
       new TextureRegion(texture, x, y, texture.getWidth, texture.getHeight)
     } else {
@@ -20,8 +20,8 @@ object Resources {
     def indexToPos(x: Int, y: Int) : Tuple2[Int, Int] = {
         (margin + (width + spacing) * x, margin + (height + spacing) * y)
     }
-    
-    val texture = new Texture(file)
+
+    val texture = StarkApp.app.manager.get(file.path, classOf[Texture])
     
     val xSlices = texture.getWidth match {
       case n if n >= margin * 2 + width => 1 + (n - margin * 2 - width) / (width + spacing)

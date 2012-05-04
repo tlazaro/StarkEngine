@@ -24,13 +24,10 @@ class Screen extends Node with Timed {
   lazy val cam = new OrthographicCamera(app.config.width, app.config.height)
   lazy val followCam = new FollowCamera(cam)
   
-  lazy val regularCam = new ScreenCam(cam)
   lazy val hudCam = new ScreenCam(new OrthographicCamera(app.config.width, app.config.height)) {
     cam.position.set(app.config.width / 2, app.config.height / 2, 0)
     cam.update()
   }
-  
-  lazy val specialCam = new FakeCam
   
   protected[this] val renderables = new ArrayBuffer[Drawable]
   protected[this] val specialRenderables = new ArrayBuffer[Drawable]
@@ -90,7 +87,7 @@ class Screen extends Node with Timed {
   def pick(x: Int, y: Int) = {
     screenToCanvas(x, y, tmp)
     
-    for(d <- regularCam.drawables) {
+    for(d <- foreground.getChildren) {
       d match {
         case s: Sprite => s.selected = s.isOver(tmp.x, tmp.y)
         case _ => d.selected = false
