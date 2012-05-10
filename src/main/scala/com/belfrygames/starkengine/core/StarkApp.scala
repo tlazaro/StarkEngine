@@ -6,10 +6,6 @@ import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Input
 import com.badlogic.gdx.InputAdapter
 import com.badlogic.gdx.InputMultiplexer
-import com.badlogic.gdx.assets.AssetManager
-import com.badlogic.gdx.assets.loaders.TextureLoader
-import com.badlogic.gdx.assets.loaders.resolvers.InternalFileHandleResolver
-import com.badlogic.gdx.graphics.Texture
 import com.belfrygames.starkengine.tags._
 
 sealed trait ResizePolicy
@@ -54,9 +50,6 @@ class StarkApp private(val config: Config) extends ApplicationListener with Upda
   }
   
   protected[this] val timer = new StopWatch
-  
-  val manager = new AssetManager
-  manager.setLoader(classOf[Texture], new TextureLoader(new InternalFileHandleResolver()))
   
   def create() {
     Gdx.app.log("StarkApp", "Created Stark App")

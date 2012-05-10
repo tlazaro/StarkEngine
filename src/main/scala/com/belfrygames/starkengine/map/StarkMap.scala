@@ -48,8 +48,7 @@ object StarkMap {
                   }
                 
                   result.tileSetName = tileSetName
-                  result.tileSet = TileSet.fromSplitTexture(
-                    Resources.split(tileSetName, result.tileWidth, result.tileHeight, 1, 2, false, false))
+                  result.tileSet = TileSet.buildTileSet(Resources.loadFile(tileSetName))
                 
                   result.clearLayers()
                   for((key, value) <- layersDef; list = value.asInstanceOf[List[List[Double]]]) {
@@ -112,11 +111,8 @@ class StarkMap(private var width0: Int,
   override def update(elapsed : Long @@ Milliseconds) {
     super.update(elapsed)
     
-    if (tileSet == null) {
-      tileSet = TileSet.fromSplitTexture(Resources.split(tileSetName, tileWidth, tileHeight, 1, 2, false, false))
-      for(layer <- layers) {
-        layer.tileSet = tileSet
-      }
+    if (!tileSet.loadedTiles) {
+      tileSet.reloadTiles()
     }
   }
   
@@ -225,12 +221,6 @@ class StarkMap(private var width0: Int,
   
   def layerNames(): Array[String] = layers.map(_.name).toArray
   def layerVisible(): Array[Boolean] = layers.map(_.visible).toArray
-  
-  def fromTexture(regions: Array[Array[TextureRegion]]) {
-    val tiles = TileSet.fromSplitTexture(regions)
-    val layer = addLayer("background", 0)
-    layer.fill(tiles)
-  }
   
   var currentLayer = -1
   def getCurrentLayer: Layer = if (currentLayer < 0) layers.last else layers(currentLayer)
