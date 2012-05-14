@@ -78,7 +78,7 @@ class TileSet(val file: String, // Path hacia el archivo de imagen, relativo o a
   var loadedTiles = false
   /** Processes the file and assigns the texture to the defined tiles */
   def reloadTiles() {
-    val regs = Resources.split(file, width, height, margin, spacing, false, false).flatten
+    val regs = Resources.split(file, width, height, margin, spacing, false, false)
     for ((tile, reg) <- tiles.zip(regs)) {
       tile.primitive = reg
     }

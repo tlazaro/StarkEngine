@@ -1,12 +1,10 @@
 package com.belfrygames.starkengine.core
 
-import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.assets.AssetManager
 import com.badlogic.gdx.assets.loaders.FileHandleResolver
 import com.badlogic.gdx.assets.loaders.SynchronousAssetLoader
 import com.badlogic.gdx.assets.loaders.TextureLoader
 import com.badlogic.gdx.assets.loaders.resolvers.InternalFileHandleResolver
-import com.badlogic.gdx.assets.loaders.AsynchronousAssetLoader
 import com.badlogic.gdx.assets.AssetDescriptor
 import com.badlogic.gdx.assets.AssetLoaderParameters
 import com.badlogic.gdx.files.FileHandle
@@ -25,7 +23,7 @@ object Resources {
     }
   }
   
-  def split(texture : Texture, width: Int, height: Int, margin: Int, spacing: Int, flipX: Boolean, flipY: Boolean) : Array[Array[TextureRegion]] = {
+  def split(texture : Texture, width: Int, height: Int, margin: Int, spacing: Int, flipX: Boolean, flipY: Boolean) : Array[TextureRegion] = {
     def indexToPos(x: Int, y: Int) : Tuple2[Int, Int] = {
       (margin + (width + spacing) * x, margin + (height + spacing) * y)
     }
@@ -39,18 +37,18 @@ object Resources {
       case _ => 0
     }
     
-    val res = Array.ofDim[TextureRegion](ySlices, xSlices)
+    val res = Array.ofDim[TextureRegion](ySlices * xSlices)
     for (x <- 0 until xSlices; y <- 0 until ySlices) {
       val coords = indexToPos(x, y)
-      res(y)(x) = new TextureRegion(texture, coords._1, coords._2, width, height)
-      res(y)(x).flip(flipX, flipY)
+      res(y * xSlices + x) = new TextureRegion(texture, coords._1, coords._2, width, height)
+      res(y * xSlices + x).flip(flipX, flipY)
     }
     
     res
   }
   
-  def split(name: String, width: Int, height: Int, margin: Int, spacing: Int, flipX: Boolean, flipY: Boolean) : Array[Array[TextureRegion]] = {
-    val texture = getTexture(name)
+  def split(name: String, width: Int, height: Int, margin: Int, spacing: Int, flipX: Boolean, flipY: Boolean) : Array[TextureRegion] = {
+    val texture = getAsset[Texture](name)
     Resources.split(texture, width, height, margin, spacing, flipX, flipY)
   }
   
@@ -58,18 +56,8 @@ object Resources {
     Resources.loadWithFileHandle(new FileHandle(file), width, height, x, y)
   }
   
-  private def getTexture(name: String) = {
-    println("OPENGL: " + Gdx.gl)
-    println("GLU: " + Gdx.glu)
-    if (!assets.isLoaded(name)) {
-      assets.load(name, classOf[Texture])
-      assets.finishLoading()
-    }
-    assets.get(name, classOf[Texture])
-  }
-  
   def load(name : String, width: Int = -1, height: Int = -1, x: Int = 0, y: Int = 0) : TextureRegion = {
-    val texture = getTexture(name)
+    val texture = getAsset[Texture](name)
     if (width < 0 || height < 0) {
       new TextureRegion(texture, x, y, texture.getWidth, texture.getHeight)
     } else {
