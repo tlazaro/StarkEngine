@@ -22,6 +22,7 @@ object Node {
 trait Node extends Drawable with Updateable with Particle with Spatial {
   var parent: Option[Node] = None
   private var children = Vector[(String, Node)]()
+  private var controller: Controller[Node] = null
   
   var graphic : Graphic[_] = null
   def width = if (graphic != null) graphic.width else -1
@@ -210,5 +211,20 @@ trait Node extends Drawable with Updateable with Particle with Spatial {
   final protected def updateChildren(elapsed : Long @@ Milliseconds) { children foreach (_._2 update elapsed) }
   
   /** Updates this node and it's children */
-  override def update(elapsed : Long @@ Milliseconds) { updateChildren(elapsed) }
+  override def update(elapsed : Long @@ Milliseconds) {
+    if (controller != null) {
+      controller.update(elapsed)
+      if (controller.finished) {
+        controller.onEnd()
+        controller = null
+      }
+    }
+    updateChildren(elapsed)
+  }
+  
+  def setController(controller: Controller[Node]) {
+    this.controller = controller
+    controller.setTarget(this)
+    controller.onStart()
+  }
 }

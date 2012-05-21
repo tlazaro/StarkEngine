@@ -36,6 +36,6 @@ class StarkAppTest extends FunSuite {
       }
     }
     
-    val app = new LwjglApplication(new StarkApp(new Config(resources, new ScreenTest())), config)
+    val app = new LwjglApplication(StarkApp(new Config(resources, new ScreenTest())), config)
   }
 }

@@ -3,6 +3,7 @@ package com.belfrygames.starkengine.core
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.InputAdapter
 import com.badlogic.gdx.math.Vector3
+import com.belfrygames.starkengine.tags._
 
 class ScreenTest extends Screen {
   override def register() {
@@ -37,8 +38,15 @@ class ScreenTest extends Screen {
     a.add(b, "b")
     
     val c = Sprite(app.res.get("eddard"))
-    c.y = 50
     node.add(c, "c")
+    
+    c.setController(new ControllerQueue(
+        new MoveTo(Point2D(200, 0), tag[Milliseconds](1000L)),
+        new MoveTo(Point2D(200, 200), tag[Milliseconds](1000L)),
+        new MoveTo(Point2D(0, 200), tag[Milliseconds](1000L)),
+        new MoveTo(Point2D(0, 0), tag[Milliseconds](1000L)),
+        new MoveTo(Point2D(200, 200), tag[Milliseconds](1000L))
+      ))
     
 //    addSprite(ed)
 //    addSprite(ed2)
