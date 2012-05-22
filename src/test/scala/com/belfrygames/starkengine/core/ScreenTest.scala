@@ -40,6 +40,13 @@ class ScreenTest extends Screen {
     val c = Sprite(app.res.get("eddard"))
     node.add(c, "c")
     
+    b.setController(new Controller[Updateable]{
+        def finished(): Boolean = true
+        override def update(elapsed: Long @@ Milliseconds) {
+          println("WORKED!")
+        }
+      })
+    
     c.setController(new ControllerQueue(
         new MoveTo(Point2D(200, 0), tag[Milliseconds](1000L)),
         new MoveTo(Point2D(200, 200), tag[Milliseconds](1000L)),
