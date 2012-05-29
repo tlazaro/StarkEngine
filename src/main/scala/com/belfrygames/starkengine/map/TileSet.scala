@@ -40,9 +40,6 @@ object TileSet {
                     new Tile(null, name, moveCost.toInt, defense.toInt)
                   }
                   
-                  println("Tile List length: " + tileList.length)
-                  tileList foreach println
-                  
                   result = new TileSet(file, TileSet.ARGB, tileList.toIndexedSeq, width.toInt, height.toInt, margin,
                                        spacing, offsetX, offsetY)
                 }
