@@ -1,6 +1,8 @@
 package com.belfrygames.starkengine.map
 
 import com.belfrygames.starkengine.core.Resources
+import com.belfrygames.starkengine.script._
+import com.belfrygames.starkengine.script.JSON._
 
 object TileSet {
   trait FileType
@@ -12,12 +14,6 @@ object TileSet {
   }
   
   def buildTileSet(update: JSON.ParseResult[Any]): TileSet = {
-    val isMap: PartialFunction[Any, Map[String, Any]] = {case n: Map[String, Any] => n}
-    val isNumber: PartialFunction[Any, Double] = {case n: Double => n}
-    val isString: PartialFunction[Any, String] = {case n: String => n}
-    val isList: PartialFunction[Any, List[Any]] = {case n: List[Any] => n}
-    val isObjectList: PartialFunction[Any, List[Map[String, Any]]] = {case n: List[Map[String, Any]] => n}
-    
     def extractNumber(op: Option[Any], default: Int): Int = op match {
       case Some(n: Double) => n.toInt
       case _ => default
@@ -28,7 +24,9 @@ object TileSet {
       case p: JSON.Success[Any] => {
           p.get match {
             case obj : Map[String, Any] => {
-                for(map <- obj.get("tileset").collect(isMap);
+                val json = JSONElement.parse(obj, None)
+                
+                for(map <- json.get("tileset").collect(isObject);
                     file <- map.get("file").collect(isString);
                     width <- map.get("width").collect(isNumber);
                     height <- map.get("height").collect(isNumber);
@@ -39,7 +37,7 @@ object TileSet {
                   val offsetX = extractNumber(map.get("offsetX"), 0)
                   val offsetY = extractNumber(map.get("offsetY"), 0)
                   
-                  val tileList = for(tile <- tiles;
+                  val tileList = for(tile <- tiles.list;
                                      name <- tile.get("name").collect(isString);
                                      moveCost <- tile.get("moveCost").collect(isNumber);
                                      defense <- tile.get("defense").collect(isNumber)) yield {

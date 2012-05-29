@@ -11,6 +11,8 @@ import javax.swing.{JComponent, JTable, TransferHandler}
 import javax.swing.event.{TableModelEvent, TableModelListener}
 import javax.swing.table.TableModel
 import scala.collection.mutable.ListBuffer
+import com.belfrygames.starkengine.script._
+import com.belfrygames.starkengine.script.JSON._
 
 object StarkMap {
   val COLUMN_NAMES = Array[String]("Visible", "Name")
@@ -21,17 +23,15 @@ object StarkMap {
   }
   
   def buildMap(update: JSON.ParseResult[Any], starkMap: StarkMap = null): StarkMap = {
-    val isMap: PartialFunction[Any, Map[String, Any]] = {case n: Map[String, Any] => n}
-    val isNumber: PartialFunction[Any, Double] = {case n: Double => n}
-    val isString: PartialFunction[Any, String] = {case n: String => n}
-    
     var result: StarkMap = starkMap
     update match {
       case p: JSON.Success[Any] => {
           p.get match {
             case obj : Map[String, Any] => {
-                for(map <- obj.get("map").collect(isMap);
-                    layersDef <- map.get("layers").collect(isMap);
+                val json = JSONElement.parse(obj, None)
+                
+                for(map <- json.get("map").collect(isObject);
+                    layersDef <- map.get("layers").collect(isObject);
                     w <- map.get("width").collect(isNumber);
                     h <- map.get("height").collect(isNumber);
                     tWidth <- map.get("tileWidth").collect(isNumber);
@@ -51,10 +51,11 @@ object StarkMap {
                   result.tileSet = TileSet.buildTileSet(Resources.loadFile(tileSetName))
                 
                   result.clearLayers()
-                  for((key, value) <- layersDef; list = value.asInstanceOf[List[List[Double]]]) {
+                  for((key, value) <- layersDef.map; list = value.asInstanceOf[JSONList[JSONList[JSONNumber]]]) {
                     val layer = result.addLayer(key)
-                    for(y <- 0 until list.size; x <- 0 until list.head.size) {
-                      layer(x, y) = list(y)(x).toInt
+                    
+                    for(y <- 0 until list.size; x <- 0 until list.list.size) {
+                      layer(x, y) = list(y, x).toInt
                       layer.tileSet = result.tileSet
                     }
                   }
