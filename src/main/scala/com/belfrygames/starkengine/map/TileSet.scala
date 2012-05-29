@@ -14,11 +14,6 @@ object TileSet {
   }
   
   def buildTileSet(update: JSON.ParseResult[Any]): TileSet = {
-    def extractNumber(op: Option[Any], default: Int): Int = op match {
-      case Some(n: Double) => n.toInt
-      case _ => default
-    } 
-    
     var result: TileSet = null
     update match {
       case p: JSON.Success[Any] => {
@@ -32,10 +27,10 @@ object TileSet {
                     height <- map.get("height").collect(isNumber);
                     tiles <- map.get("tiles").collect(isObjectList)) {
                   
-                  val margin = extractNumber(map.get("margin"), 0)
-                  val spacing = extractNumber(map.get("spacing"), 0)
-                  val offsetX = extractNumber(map.get("offsetX"), 0)
-                  val offsetY = extractNumber(map.get("offsetY"), 0)
+                  val margin = map.extractNumber("margin", 0)
+                  val spacing = map.extractNumber("spacing", 0)
+                  val offsetX = map.extractNumber("offsetX", 0)
+                  val offsetY = map.extractNumber("offsetY", 0)
                   
                   val tileList = for(tile <- tiles.list;
                                      name <- tile.get("name").collect(isString);
@@ -44,6 +39,9 @@ object TileSet {
                   
                     new Tile(null, name, moveCost.toInt, defense.toInt)
                   }
+                  
+                  println("Tile List length: " + tileList.length)
+                  tileList foreach println
                   
                   result = new TileSet(file, TileSet.ARGB, tileList.toIndexedSeq, width.toInt, height.toInt, margin,
                                        spacing, offsetX, offsetY)

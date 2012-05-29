@@ -51,11 +51,11 @@ object StarkMap {
                   result.tileSet = TileSet.buildTileSet(Resources.loadFile(tileSetName))
                 
                   result.clearLayers()
-                  for((key, value) <- layersDef.map; list = value.asInstanceOf[JSONList[JSONList[JSONNumber]]]) {
+                  for((key, value) <- layersDef.map; grid = value.asInstanceOf[JSONList[JSONList[JSONNumber]]]) {
                     val layer = result.addLayer(key)
                     
-                    for(y <- 0 until list.size; x <- 0 until list.list.size) {
-                      layer(x, y) = list(y, x).toInt
+                    for(y <- 0 until grid.size; x <- 0 until grid(0).size) {
+                      layer(x, y) = grid(y, x).toInt
                       layer.tileSet = result.tileSet
                     }
                   }

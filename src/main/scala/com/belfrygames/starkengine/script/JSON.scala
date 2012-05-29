@@ -74,13 +74,15 @@ class JSONList[T <: JSONElement](val list: List[T], cont: Option[JSONObject] = N
   //for(y <- 0 until list.list.size; x <- 0 until list.list.head.asInstanceOf[JSONList].list.size) {
   
   def size() = list.size
+  
+  /** Returns the element at the specified index */
   def apply(x: Int): T = {
     require(0 <= x && x < size)
     list(x)
   }
   
   /** Specialization method for when T is a JSONNumber simplifying access to data */
-  def apply(x: Int)(implicit evidence: T =:= JSONNumber): Double = {
+  def number(x: Int)(implicit evidence: T =:= JSONNumber): Double = {
     require(0 <= x && x < size)
     list(x).value
   }
@@ -88,7 +90,7 @@ class JSONList[T <: JSONElement](val list: List[T], cont: Option[JSONObject] = N
   /** Specialization method for when T is a JSONList[JSONNumber] simplifying access to data */
   def apply(x: Int, y: Int)(implicit evidence: T =:= JSONList[JSONNumber]): Double = {
     require(0 <= x && x < size)
-    list(x)(y)
+    list(x).number(y)
   }
   
 }
