@@ -59,15 +59,12 @@ class StarkApp private(val config: Config) extends ApplicationListener with Upda
     
     config.resources.initialize()
     screen = config.firstScreen
-    
-    timer.start
+    timer.measure()
   }
   
   final def render() {
-    timer.end
     screen.draw()
-    nanoUpdate(timer.diff)
-    timer.start
+    nanoUpdate(timer.measure())
   }
   
   override def update(elapsed: Long @@ Milliseconds) {

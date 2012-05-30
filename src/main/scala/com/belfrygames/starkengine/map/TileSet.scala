@@ -31,7 +31,7 @@ object TileSet {
                   val spacing = map.extractNumber("spacing", 0)
                   val offsetX = map.extractNumber("offsetX", 0)
                   val offsetY = map.extractNumber("offsetY", 0)
-                  
+                   
                   val tileList = for(tile <- tiles.list;
                                      name <- tile.get("name").collect(isString);
                                      moveCost <- tile.get("moveCost").collect(isNumber);

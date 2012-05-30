@@ -9,11 +9,19 @@ import com.belfrygames.starkengine.core._
 class StopWatch {
   private[this] var start = 0L
   private[this] var end = 0L
+  private[this] var mark = 0L
   
-  def start() { this.start = System.nanoTime }
-  def end() { this.end = System.nanoTime }
+  def measure() = {
+    val now = System.nanoTime
+    val res = now - mark
+    mark = now
+    tag[Nanoseconds](res)
+  }
   
-  def diff = tag[Nanoseconds](this.end - this.start)
+  def start() { start = System.nanoTime }
+  def end() { end = System.nanoTime }
+  
+  def diff = tag[Nanoseconds](end - start)
   def diffMillis = tag[Milliseconds](diff / 1000000L)
   def diffSeconds = tag[Seconds](diff / 1000000000L)
 }
