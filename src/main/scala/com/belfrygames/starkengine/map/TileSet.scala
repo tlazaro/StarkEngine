@@ -25,19 +25,24 @@ object TileSet {
                     file <- map.get("file").collect(isString);
                     width <- map.get("width").collect(isNumber);
                     height <- map.get("height").collect(isNumber);
-                    tiles <- map.get("tiles").collect(isObjectList)) {
+                    tiles <- map.get("tiles").collect(isObject)) {
                   
                   val margin = map.extractNumber("margin", 0)
                   val spacing = map.extractNumber("spacing", 0)
                   val offsetX = map.extractNumber("offsetX", 0)
                   val offsetY = map.extractNumber("offsetY", 0)
                    
-                  val tileList = for(tile <- tiles.list;
-                                     name <- tile.get("name").collect(isString);
+                  val tileMap = for((name, obj) <- tiles.map; tile = obj.asInstanceOf[JSONObject];
+                                     index <- tile.get("index").collect(isNumber);
                                      moveCost <- tile.get("moveCost").collect(isNumber);
                                      defense <- tile.get("defense").collect(isNumber)) yield {
                   
-                    new Tile(null, name, moveCost.toInt, defense.toInt)
+                    (index.toInt, new Tile(null, name, moveCost.toInt, defense.toInt))
+                  }
+                  
+                  val tileList = new Array[Tile](tileMap.keySet.size)
+                  for ((idx, tile) <- tileMap) {
+                    tileList(idx) = tile
                   }
                   
                   result = new TileSet(file, TileSet.ARGB, tileList.toIndexedSeq, width.toInt, height.toInt, margin,
