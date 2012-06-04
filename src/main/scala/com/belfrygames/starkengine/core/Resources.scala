@@ -5,6 +5,7 @@ import com.badlogic.gdx.assets.loaders.FileHandleResolver
 import com.badlogic.gdx.assets.loaders.SynchronousAssetLoader
 import com.badlogic.gdx.assets.loaders.TextureLoader
 import com.badlogic.gdx.assets.loaders.resolvers.InternalFileHandleResolver
+import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.assets.AssetDescriptor
 import com.badlogic.gdx.assets.AssetLoaderParameters
 import com.badlogic.gdx.files.FileHandle
@@ -79,6 +80,13 @@ object Resources {
   assets.setLoader(classOf[Texture], new TextureLoader(new InternalFileHandleResolver()))
   assets.setLoader(classOf[String], new TextLoader(new InternalFileHandleResolver()))
   
+  class OpenBuildResolver extends FileHandleResolver {
+    override def resolve(fileName: String): FileHandle = {
+      val res = Gdx.files.external(fileName)
+      if (res.exists) res else Gdx.files.internal(fileName)
+    }
+  }
+
   class TextParameter extends AssetLoaderParameters[String]
   class TextLoader(resolver: FileHandleResolver) extends SynchronousAssetLoader[String, TextParameter](resolver) {
     override def load(manager: AssetManager, fileName: String, parameter: TextParameter): String = {
