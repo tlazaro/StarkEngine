@@ -3,6 +3,7 @@ package com.belfrygames.starkengine.core
 import com.belfrygames.starkengine.tags._
 import com.belfrygames.starkengine.utils._
 import com.badlogic.gdx.Gdx
+import com.badlogic.gdx.InputAdapter
 import com.badlogic.gdx.graphics.GL10
 import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.g2d.BitmapFont
@@ -14,7 +15,7 @@ import scala.collection.mutable.ArrayBuffer
 
 object Screen {
   var DEBUG = false
-  var SHOW_KEYS = true
+  var SHOW_KEYS = false
 }
 
 class Screen extends Node with Timed {
@@ -58,6 +59,8 @@ class Screen extends Node with Timed {
     cam.position.set(0, 0, 0)
     followCam.update(tag(0))
     hudCam.cam.position.set(0, 0, 0)
+    
+    app.inputs.addProcessor(new ScreenDebugKeysController())
   }
   
   val tmp = new Vector3()
@@ -135,6 +138,7 @@ class Screen extends Node with Timed {
 - F2 : Screen: FitScreen
 - F3 : Screen: Original
 - F4 : Screen: Stretch
+- F5 : Screen: Original Canvas
 - Arrows or WASD: Move
 - X or Space: Action
 - +/- Zoom in/out
@@ -163,4 +167,18 @@ class Screen extends Node with Timed {
   
   def pause( ) { }
   def dispose( ) { }
+}
+
+class ScreenDebugKeysController extends InputAdapter {
+  import com.badlogic.gdx.Input.Keys._
+
+  override def keyUp(keycode : Int) : Boolean = {
+    keycode match {
+      case TAB => Screen.DEBUG = !Screen.DEBUG
+      case F1 => Screen.SHOW_KEYS = !Screen.SHOW_KEYS
+      case _ =>
+    }
+
+    false
+  }
 }

@@ -115,6 +115,7 @@ class DebugKeysController(app: StarkApp) extends InputAdapter {
       case F2 => app.resizePolicy = FitScreen; app.resize(Gdx.graphics.getWidth, Gdx.graphics.getHeight)
       case F3 => app.resizePolicy = Original; app.resize(Gdx.graphics.getWidth, Gdx.graphics.getHeight)
       case F4 => app.resizePolicy = Stretch; app.resize(Gdx.graphics.getWidth, Gdx.graphics.getHeight)
+      case F5 => app.resizePolicy = OriginalCanvas; app.resize(Gdx.graphics.getWidth, Gdx.graphics.getHeight)
       case _ =>
     }
 
