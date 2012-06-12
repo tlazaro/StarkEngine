@@ -47,9 +47,11 @@ class Screen extends Node with Timed {
     cam.update()
   }
   
+  /** Called by StarkApp when it sets this as current screen */
   def register() {
   }
   
+  /** Called by StarkApp when this is the current screen and is being replaced */
   def deregister() {
   }
   

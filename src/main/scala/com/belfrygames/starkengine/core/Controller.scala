@@ -12,6 +12,9 @@ abstract class Controller[T <: Updateable] extends Updateable {
   
   def finished(): Boolean
 
+  /** Called when in need of forcing the end of the controller */
+  def forceFinish()
+  
   /** Called by controllee when started using controller */
   def onStart() {}
   
@@ -35,6 +38,8 @@ abstract class TimedController[T <: Updateable](var duration: Long @@ Millisecon
   def fraction(): Float = time.toFloat / duration.toFloat
   
   def finished() = time >= duration
+  
+  def forceFinish() = time = duration
 }
 
 class NodeController(duration: Long @@ Milliseconds) extends TimedController[Node](duration) {
@@ -88,8 +93,6 @@ class ControllerQueue[T <: Updateable](controllers0: Controller[T]*) extends Con
     }
   }
   
-  def finished() = controllers.isEmpty
-  
   /** Called by controllee when started using controller */
   override def onStart() {
     super.onStart()
@@ -98,6 +101,13 @@ class ControllerQueue[T <: Updateable](controllers0: Controller[T]*) extends Con
     if (!controllers.isEmpty) {
       controllers.head.onStart()
     }
+  }
+  
+  def finished() = controllers.isEmpty
+  
+  def forceFinish() {
+    controllers.foreach(_.forceFinish)
+    controllers.clear
   }
 }
 
@@ -126,6 +136,11 @@ class ControllerSet[T <: Updateable](controllers0: Controller[T]*) extends Contr
   }
   
   def finished() = controllers.isEmpty
+  
+  def forceFinish() {
+    controllers.foreach(_.forceFinish)
+    controllers.clear
+  }
 }
 
 object Controller {

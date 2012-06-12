@@ -45,11 +45,16 @@ class StarkApp private(val config: Config) extends ApplicationListener with Upda
   
   def screen = _screen
   def screen_=(value: Screen) = synchronized {
+    if (_screen != null)
+      _screen.deregister()
+    
     _screen = value
     if(!_screen.isCreated())
       _screen.create(this)
     
     _screen.resize(targetWidth, targetHeight)
+    
+    _screen.register()
   }
   
   protected[this] val timer = new StopWatch
