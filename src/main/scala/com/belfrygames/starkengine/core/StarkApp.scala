@@ -44,9 +44,12 @@ class StarkApp private(val config: Config) extends ApplicationListener with Upda
   lazy val res = config.resources
   
   def screen = _screen
-  def screen_=(value: Screen) = {
+  def screen_=(value: Screen) = synchronized {
     _screen = value
-    _screen.create(this)
+    if(!_screen.isCreated())
+      _screen.create(this)
+    
+    _screen.resize(targetWidth, targetHeight)
   }
   
   protected[this] val timer = new StopWatch
@@ -62,7 +65,7 @@ class StarkApp private(val config: Config) extends ApplicationListener with Upda
     timer.measure()
   }
   
-  final def render() {
+  final def render(): Unit = synchronized {
     screen.draw()
     nanoUpdate(timer.measure())
   }

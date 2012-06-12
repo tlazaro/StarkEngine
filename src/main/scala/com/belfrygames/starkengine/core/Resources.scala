@@ -68,7 +68,7 @@ object Resources {
   
   def loadFile(file: String) = getAsset[String](file)
   
-  private def getAsset[T:Manifest](name: String): T = {
+  def getAsset[T:Manifest](name: String): T = {
     if (!assets.isLoaded(name)) {
       assets.load(name, manifest[T].erasure)
       assets.finishLoading()

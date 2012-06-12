@@ -30,6 +30,9 @@ class Screen extends Node with Timed {
     cam.update()
   }
   
+  protected var created = false
+  def isCreated() = created
+  
   protected[this] val renderables = new ArrayBuffer[Drawable]
   protected[this] val specialRenderables = new ArrayBuffer[Drawable]
   
@@ -61,6 +64,8 @@ class Screen extends Node with Timed {
     hudCam.cam.position.set(0, 0, 0)
     
     app.inputs.addProcessor(new ScreenDebugKeysController())
+    
+    created = true
   }
   
   val tmp = new Vector3()

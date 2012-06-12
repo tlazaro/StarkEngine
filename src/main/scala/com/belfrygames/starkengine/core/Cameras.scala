@@ -12,7 +12,7 @@ object FollowCamera {
 }
 
 class FollowCamera(val camera : Camera) extends AcceleratedUpdateable {
-  var target : Accelerated = _
+  var target : Particle = _
   val offset = new Vector2(0.0f, 0.0f)
 
   var minX = 0.0f
