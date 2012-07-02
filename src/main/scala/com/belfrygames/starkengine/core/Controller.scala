@@ -73,25 +73,48 @@ class MoveTo(val dest: Point2D[Float], duration0: Long @@ Milliseconds) extends 
 }
 
 class Rotate(val amount: Float, duration0: Long @@ Milliseconds) extends TimedController[Node](duration0) {
-  var last = 0f
+  var start = 0f
   override def update(elapsed: Long @@ Milliseconds) {
     super.update(elapsed)
-    
-    last = (amount - last) * fraction
-    target.rotation += last
+    target.rotation = start + amount * fraction
   }
   
   /** Called by controllee when started using controller */
   override def onStart() {
     super.onStart()
+    start = target.rotation
   }
   
   /** Called by controllee when finished using controller */
   override def onEnd() {
     super.onEnd()
+    target.rotation = start + amount
   }
 }
 
+class Scale(val scaleX: Float, val scaleY: Float, duration0: Long @@ Milliseconds) extends TimedController[Node](duration0) {
+  var startX = 0f
+  var startY = 0f
+  override def update(elapsed: Long @@ Milliseconds) {
+    super.update(elapsed)
+    target.scaleX = startX + startX * (scaleX - 1) * fraction
+    target.scaleY = startY + startY * (scaleY - 1) * fraction
+  }
+  
+  /** Called by controllee when started using controller */
+  override def onStart() {
+    super.onStart()
+    startX = target.scaleX
+    startY = target.scaleY
+  }
+  
+  /** Called by controllee when finished using controller */
+  override def onEnd() {
+    super.onEnd()
+    target.scaleX = startX * scaleX
+    target.scaleY = startY * scaleY
+  }
+}
 
 class ControllerQueue[T <: Updateable](controllers0: Controller[T]*) extends Controller[T] {
   protected val controllers = new ListBuffer[Controller[T]]()

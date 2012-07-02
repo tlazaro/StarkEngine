@@ -66,11 +66,10 @@ class Text(private var _primitive: BitmapFont, var text: String = "") extends Gr
     if (_primitive != null) {
       _primitive.setScale(scaleX, scaleY)
       bounds = _primitive.getBounds(text)
-      
-      _primitive.draw(spriteBatch, text, x, y + bounds.height)
+      _primitive.draw(spriteBatch, text, x + centerX - scaleX * centerX, y + height - centerY + scaleY * centerY)
     }
   }
   
-  override def width: Float = if (bounds != null) bounds.width else -1
-  override def height: Float = if (bounds != null) bounds.height else -1
+  override def width: Float = if (bounds != null) (bounds.width / _primitive.getScaleX) else -1
+  override def height: Float = if (bounds != null) (bounds.height / _primitive.getScaleY) else -1
 }

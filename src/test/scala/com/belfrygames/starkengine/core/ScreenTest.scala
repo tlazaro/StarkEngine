@@ -20,7 +20,6 @@ class ScreenTest extends Screen {
   lazy val ed3 = Sprite(app.res.get("eddard"))
   lazy val ed4 = Sprite(app.res.get("eddard"))
   lazy val cursor = Sprite(app.res.get("cursor"))
-  lazy val testFont = new BitmapFont
   
   val node = new Node(){}
   val target = node
@@ -33,23 +32,28 @@ class ScreenTest extends Screen {
     foreground.add(node, "node")
     
     val cont = new Node(){}
-    val label = new Label(new Text(testFont, "Algo"))
     node.add(cont, "labelcont")
-    cont.add(label, "label")
+    cont.x = -200
     
     cont.setController(new ControllerQueue(
-        new Rotate(1.0f, tag[Milliseconds](5000L)),
-        new Rotate(-1.0f, tag[Milliseconds](5000L))
+        new Rotate(360.0f, tag[Milliseconds](5000L))
       ))
     
-    label.setOrigin(0.5f, 0.5f)
+    val label2 = new Label(new Text(new BitmapFont, "Me gusta Stark Engine"))
+    cont.add(label2, "label2")
+    
+    label2.setOrigin(0.5f, 0.5f)
+
+    label2.setController(new ControllerSet(
+        new Scale(3f, 3f, tag[Milliseconds](5000L))
+      ))
     
     val a = Sprite(app.res.get("eddard"))
     node.add(a, "a")
     
     a.setController(new ControllerQueue(
-        new Rotate(1.0f, tag[Milliseconds](5000L)),
-        new Rotate(-1.0f, tag[Milliseconds](5000L))
+        new Rotate(90.0f, tag[Milliseconds](2000L)),
+        new Rotate(-90.0f, tag[Milliseconds](2000L))
       ))
     
     val b = Sprite(app.res.get("eddard"))
