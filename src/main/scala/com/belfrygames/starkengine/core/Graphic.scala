@@ -47,11 +47,7 @@ class Tex(override var primitive: Texture) extends Graphic[Texture] {
   override def height: Float = if (primitive != null) primitive.getHeight else -1
 }
 
-class Text(
-  private var _primitive: BitmapFont,
-  var text: String = "",
-  var size: Int = 14) extends Graphic[BitmapFont] {
-  
+class Text(private var _primitive: BitmapFont, var text: String = "") extends Graphic[BitmapFont] {
   private var bounds: BitmapFont.TextBounds = null
   
   primitive = _primitive
