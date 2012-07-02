@@ -23,6 +23,7 @@ trait Node extends Drawable with Updateable with Particle with Spatial {
   var parent: Option[Node] = None
   private var children = Vector[(String, Node)]()
   private var controller: Controller[_ >: Node] = null
+  var touchEvent: TouchEvent.Value = TouchEvent.Empty
   
   var graphic : Graphic[_] = null
   def width = if (graphic != null) graphic.width else -1
@@ -155,10 +156,14 @@ trait Node extends Drawable with Updateable with Particle with Spatial {
   }
   
   override def debugDraw(renderer : ShapeRenderer) {
+    val transX = x + xOffset
+    val transY = y + yOffset
+    
+    renderer.translate(transX, transY, 0f)
+    renderer.rotate(0f, 0f, 1f, rotation)
+    renderer.scale(scaleX, scaleY, 1f)
+    
     if (graphic != null) {
-      val transX = x + xOffset
-      val transY = y + yOffset
-      
       def bounds() {
         if (selected) {
           renderer.setColor(1f, 0f, 0f, 1f)
@@ -166,10 +171,6 @@ trait Node extends Drawable with Updateable with Particle with Spatial {
           renderer.setColor(0f, 1f, 0f, 1f)
         }
         renderer.begin(ShapeType.Rectangle)
-        renderer.identity()
-        renderer.translate(transX, transY, 0f)
-        renderer.rotate(0f, 0f, 1f, rotation)
-        renderer.scale(scaleX, scaleY, 1f)
         renderer.rect(-(originX + xOffset), -(originY + yOffset), width, height)
         renderer.end()
       }
@@ -177,10 +178,6 @@ trait Node extends Drawable with Updateable with Particle with Spatial {
       def cross() {
         renderer.setColor(1f, 1f, 1f, 1f)
         renderer.begin(ShapeType.Line)
-        renderer.identity()
-        renderer.translate(transX, transY, 0f)
-        renderer.rotate(0f, 0f, 1f, rotation)
-        renderer.scale(scaleX, scaleY, 1f)
         renderer.line(-5, -5, 5, 5)
         renderer.line(-5, 5, 5, -5)
         renderer.end()
@@ -191,10 +188,6 @@ trait Node extends Drawable with Updateable with Particle with Spatial {
         for(x <- Range.Double.inclusive(-512, 512, 5); y <- Range.Double.inclusive(-320, 320, 5)) {
           if (isOver(x.toFloat, y.toFloat)) {
             renderer.setColor(1f, 0f, 0f, 0.5f)
-            renderer.identity()
-            renderer.translate(x.toFloat, y.toFloat, 0f)
-            renderer.rotate(0f, 0f, 1f, rotation)
-            renderer.scale(scaleX, scaleY, 1f)
             renderer.point(0, 0, 0)
           }
         }
@@ -206,6 +199,10 @@ trait Node extends Drawable with Updateable with Particle with Spatial {
     }
     
     debugDrawChildren(renderer)
+    
+    renderer.scale(1.0f / scaleX, 1.0f / scaleY, 1f)
+    renderer.rotate(0f, 0f, 1f, -rotation)
+    renderer.translate(-transX, -transY, 0f)
   }
   
   final protected def updateChildren(elapsed : Long @@ Milliseconds) { children foreach (_._2 update elapsed) }

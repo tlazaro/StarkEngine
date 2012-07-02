@@ -72,6 +72,27 @@ class MoveTo(val dest: Point2D[Float], duration0: Long @@ Milliseconds) extends 
   }
 }
 
+class Rotate(val amount: Float, duration0: Long @@ Milliseconds) extends TimedController[Node](duration0) {
+  var last = 0f
+  override def update(elapsed: Long @@ Milliseconds) {
+    super.update(elapsed)
+    
+    last = (amount - last) * fraction
+    target.rotation += last
+  }
+  
+  /** Called by controllee when started using controller */
+  override def onStart() {
+    super.onStart()
+  }
+  
+  /** Called by controllee when finished using controller */
+  override def onEnd() {
+    super.onEnd()
+  }
+}
+
+
 class ControllerQueue[T <: Updateable](controllers0: Controller[T]*) extends Controller[T] {
   protected val controllers = new ListBuffer[Controller[T]]()
   controllers0 foreach add

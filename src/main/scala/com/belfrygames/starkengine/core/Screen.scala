@@ -97,11 +97,30 @@ class Screen extends Node with Timed {
   def pick(x: Int, y: Int) = {
     screenToCanvas(x, y, tmp)
     
-    for(d <- foreground.getChildren) {
-      d match {
-        case s: Sprite => s.selected = s.isOver(tmp.x, tmp.y)
-        case _ => d.selected = false
-      }
+    foreground.getChildren.view.reverse.find(_.isOver(tmp.x, tmp.y)) match {
+      case Some(selected) => {
+          if (!selected.selected) {
+            selected.selected = true
+            selected.touchEvent = TouchEvent.Entered
+          }
+          
+          if (TouchEvent.over.isDefined) {
+            if (TouchEvent.over.get != selected) {
+              TouchEvent.over.get.selected = false
+              TouchEvent.over.get.touchEvent = TouchEvent.Exited
+              TouchEvent.over = Some(selected)
+            }
+          } else {
+            TouchEvent.over = Some(selected)
+          }
+        }
+      case _ => {
+          TouchEvent.over foreach { n =>
+            n.selected = false
+            n.touchEvent = TouchEvent.Exited
+          }
+          TouchEvent.over = None
+        }
     }
   }
   

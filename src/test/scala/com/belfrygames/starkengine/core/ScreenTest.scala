@@ -2,6 +2,7 @@ package com.belfrygames.starkengine.core
 
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.InputAdapter
+import com.badlogic.gdx.graphics.g2d.BitmapFont
 import com.badlogic.gdx.math.Vector3
 import com.belfrygames.starkengine.tags._
 
@@ -19,6 +20,7 @@ class ScreenTest extends Screen {
   lazy val ed3 = Sprite(app.res.get("eddard"))
   lazy val ed4 = Sprite(app.res.get("eddard"))
   lazy val cursor = Sprite(app.res.get("cursor"))
+  lazy val testFont = new BitmapFont
   
   val node = new Node(){}
   val target = node
@@ -30,8 +32,25 @@ class ScreenTest extends Screen {
     
     foreground.add(node, "node")
     
+    val cont = new Node(){}
+    val label = new Label(new Text(testFont, "Algo"))
+    node.add(cont, "labelcont")
+    cont.add(label, "label")
+    
+    cont.setController(new ControllerQueue(
+        new Rotate(1.0f, tag[Milliseconds](5000L)),
+        new Rotate(-1.0f, tag[Milliseconds](5000L))
+      ))
+    
+    label.setOrigin(0.5f, 0.5f)
+    
     val a = Sprite(app.res.get("eddard"))
     node.add(a, "a")
+    
+    a.setController(new ControllerQueue(
+        new Rotate(1.0f, tag[Milliseconds](5000L)),
+        new Rotate(-1.0f, tag[Milliseconds](5000L))
+      ))
     
     val b = Sprite(app.res.get("eddard"))
     b.x = 100
@@ -41,6 +60,7 @@ class ScreenTest extends Screen {
     node.add(c, "c")
     
     b.setController(new Controller[Updateable]{
+        def forceFinish() {}
         def finished(): Boolean = true
         override def update(elapsed: Long @@ Milliseconds) {
           println("WORKED!")
