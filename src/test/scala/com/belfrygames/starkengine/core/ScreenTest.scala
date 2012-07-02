@@ -39,7 +39,7 @@ class ScreenTest extends Screen {
         new Rotate(360.0f, tag[Milliseconds](5000L))
       ))
     
-    val label2 = new Label(new Text(new BitmapFont, "Me gusta Stark Engine"))
+    val label2 = new Label(new Text(new BitmapFont, "Me gusta\nStark Engine"))
     cont.add(label2, "label2")
     
     label2.setOrigin(0.5f, 0.5f)

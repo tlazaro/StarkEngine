@@ -66,7 +66,7 @@ class Text(private var _primitive: BitmapFont, var text: String = "") extends Gr
     if (_primitive != null) {
       _primitive.setScale(scaleX, scaleY)
       bounds = _primitive.getBounds(text)
-      _primitive.draw(spriteBatch, text, x + centerX - scaleX * centerX, y + height - centerY + scaleY * centerY)
+      _primitive.drawMultiline(spriteBatch, text, x + centerX - scaleX * centerX, y + height - centerY + scaleY * centerY)
     }
   }
   
