@@ -35,18 +35,41 @@ class ScreenTest extends Screen {
     node.add(cont, "labelcont")
     cont.x = -200
     
-    cont.setController(new ControllerQueue(
-        new Rotate(360.0f, tag[Milliseconds](5000L))
-      ))
+//    cont.setController(new ControllerQueue(
+//        new Rotate(360.0f, tag[Milliseconds](5000L))
+//      ))
     
-    val label2 = new Label(new Text(new BitmapFont, "Me gusta\nStark Engine"))
+    val label2 = new Label(new BitmapText(new BitmapFont, "Me gusta\nStark Engine\nMucho Mucho\nCacacacaca"))
     cont.add(label2, "label2")
+    label2.y = -30
+    label2.x = -100
+    
+    label2.scaleX = 2
+    label2.scaleY = 2
     
     label2.setOrigin(0.5f, 0.5f)
-
-    label2.setController(new ControllerSet(
-        new Scale(3f, 3f, tag[Milliseconds](5000L))
-      ))
+    
+    val label3 = new Label(Text.getText(15, "15 Me gusta\nStark Engine\nMucho Mucho"))
+    cont.add(label3, "label3")
+    label3.y = -60
+    
+    label3.scaleX = 2
+    label3.scaleY = 2
+    
+    label3.setOrigin(1.0f, 1.0f)
+    
+    val label7 = new Label(Text.getText(32, "Me gusta\nStark Engine\nMucho Mucho\nCacacacaca"))
+    cont.add(label7, "label7")
+    label7.y = -240
+    
+    label7.scaleX = 2
+    label7.scaleY = 2
+    
+    label7.setOrigin(0.5f, 0.5f)
+    
+//    label2.setController(new ControllerSet(
+//        new Scale(3f, 3f, tag[Milliseconds](5000L))
+//      ))
     
     val a = Sprite(app.res.get("eddard"))
     node.add(a, "a")

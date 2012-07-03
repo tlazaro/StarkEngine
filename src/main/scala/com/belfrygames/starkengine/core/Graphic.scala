@@ -4,6 +4,8 @@ import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.BitmapFont
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.g2d.TextureRegion
+import com.badlogic.gdx.graphics.g2d.stbtt.TrueTypeFontFactory
+import com.badlogic.gdx.Gdx
 
 object Graphic {
   def apply(region: TextureRegion) = {
@@ -47,7 +49,21 @@ class Tex(override var primitive: Texture) extends Graphic[Texture] {
   override def height: Float = if (primitive != null) primitive.getHeight else -1
 }
 
-class Text(private var _primitive: BitmapFont, var text: String = "") extends Graphic[BitmapFont] {
+object Text {
+  val FONT_CHARACTERS = """abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789][_!$%#@|\/?-+=()*&.;,{}"´`'<>"""
+  
+  def getText(pixelSize: Int, text: String): TrueTypeText = {
+    new TrueTypeText(getFont(pixelSize), text)
+  }
+  
+  def getFont(pixelSize: Int): BitmapFont = {
+    TrueTypeFontFactory.createBitmapFont(
+      Gdx.files.internal("com/belfrygames/starkengine/ubuntu.ttf"),
+      FONT_CHARACTERS, 1024, 640, pixelSize, 1024, 640)
+  }
+}
+
+class BitmapText(private var _primitive: BitmapFont, var text: String = "") extends Graphic[BitmapFont] {
   private var bounds: BitmapFont.TextBounds = null
   
   primitive = _primitive
@@ -56,6 +72,7 @@ class Text(private var _primitive: BitmapFont, var text: String = "") extends Gr
     _primitive = value
     if (_primitive != null) {
       bounds = _primitive.getBounds(text)
+      bounds = _primitive.getMultiLineBounds(text)
     } else {
       bounds = null
     }
@@ -65,11 +82,59 @@ class Text(private var _primitive: BitmapFont, var text: String = "") extends Gr
   override def draw(spriteBatch: SpriteBatch, x: Float, y: Float, centerX: Float, centerY: Float, width: Float, height: Float, scaleX: Float, scaleY: Float, rotation: Float) {
     if (_primitive != null) {
       _primitive.setScale(scaleX, scaleY)
-      bounds = _primitive.getBounds(text)
-      _primitive.drawMultiline(spriteBatch, text, x + centerX - scaleX * centerX, y + height - centerY + scaleY * centerY)
+      val textx = scala.math.round(x + centerX - scaleX * centerX)
+      val texty = scala.math.round(y + centerY - scaleY * centerY + height * scaleY)
+      _primitive.drawMultiLine(spriteBatch, text, textx, texty)
     }
   }
   
-  override def width: Float = if (bounds != null) (bounds.width / _primitive.getScaleX) else -1
-  override def height: Float = if (bounds != null) (bounds.height / _primitive.getScaleY) else -1
+  override def width: Float = {
+    if (bounds != null) {
+      (bounds.width / _primitive.getScaleX)
+    } else -1
+  }
+  
+  override def height: Float = {
+    if (_primitive != null) {
+      ((_primitive.getLineHeight * text.lines.size) / _primitive.getScaleY)
+    } else -1
+  }
+}
+
+class TrueTypeText(private var _primitive: BitmapFont, var text: String = "") extends Graphic[BitmapFont] {
+  private var bounds: BitmapFont.TextBounds = null
+  
+  primitive = _primitive
+  
+  override def primitive_=(value: BitmapFont) = {
+    _primitive = value
+    if (_primitive != null) {
+      bounds = _primitive.getBounds(text)
+      bounds = _primitive.getMultiLineBounds(text)
+    } else {
+      bounds = null
+    }
+  }
+  override def primitive = _primitive
+  
+  override def draw(spriteBatch: SpriteBatch, x: Float, y: Float, centerX: Float, centerY: Float, width: Float, height: Float, scaleX: Float, scaleY: Float, rotation: Float) {
+    if (_primitive != null) {
+      _primitive.setScale(scaleX, scaleY)
+      val textx = scala.math.round(x + centerX - scaleX * centerX)
+      val texty = scala.math.round(y + centerY - scaleY * centerY + height * scaleY - _primitive.getLineHeight)
+      _primitive.drawMultiLine(spriteBatch, text, textx, texty)
+    }
+  }
+  
+  override def width: Float = {
+    if (bounds != null) {
+      (bounds.width / _primitive.getScaleX)
+    } else -1
+  }
+  
+  override def height: Float = {
+    if (_primitive != null) {
+      ((_primitive.getLineHeight * text.lines.size) / _primitive.getScaleY)
+    } else -1
+  }
 }
