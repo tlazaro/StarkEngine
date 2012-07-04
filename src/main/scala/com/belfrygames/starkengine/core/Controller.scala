@@ -22,11 +22,24 @@ abstract class Controller[T <: Updateable] extends Updateable {
   def onEnd() {}
 }
 
-abstract class TimedController[T <: Updateable](var duration: Long @@ Milliseconds) extends Controller[T] {
-  var time = tag[Milliseconds](0L)
+trait Overtime[T <: Updateable] extends Controller[T] {
   var overtime = tag[Milliseconds](0L)
   
+  abstract override def onStart() {
+    super.onStart()
+    overtime = tag[Milliseconds](0L)
+  }
+}
+
+trait Instant[T <: Updateable] extends Controller[T] {
+}
+
+abstract class TimedController[T <: Updateable](var duration: Long @@ Milliseconds) extends Controller[T] with Overtime[T] {
+  var time = tag[Milliseconds](0L)
+  
   override def update(elapsed: Long @@ Milliseconds) {
+    super.update(elapsed)
+    
     time = tag[Milliseconds](time + elapsed)
     if (time > duration) {
       overtime = tag[Milliseconds](time - duration)
@@ -36,6 +49,11 @@ abstract class TimedController[T <: Updateable](var duration: Long @@ Millisecon
   
   /** Gets the elapsed fraction for this controller. Returns a value in the range [0.0..1.0].*/
   def fraction(): Float = time.toFloat / duration.toFloat
+  
+  override def onStart() {
+    super.onStart()
+    time = tag[Milliseconds](0L)
+  }
   
   def finished() = time >= duration
   
@@ -118,13 +136,13 @@ class Scale(val scaleX: Float, val scaleY: Float, duration0: Long @@ Millisecond
 
 class ControllerQueue[T <: Updateable](controllers0: Controller[T]*) extends Controller[T] {
   protected val controllers = new ListBuffer[Controller[T]]()
-  controllers0 foreach add
   
   def add(controller: Controller[T]) {
     controllers += controller
   }
   
   override def update(elapsed: Long @@ Milliseconds) {
+    super.update(elapsed)
     if (!controllers.isEmpty) {
       controllers.head.update(elapsed)
       if (controllers.head.finished) {
@@ -140,6 +158,7 @@ class ControllerQueue[T <: Updateable](controllers0: Controller[T]*) extends Con
   /** Called by controllee when started using controller */
   override def onStart() {
     super.onStart()
+    controllers0 foreach add
     controllers foreach (_.target = target)
     
     if (!controllers.isEmpty) {
@@ -150,40 +169,100 @@ class ControllerQueue[T <: Updateable](controllers0: Controller[T]*) extends Con
   def finished() = controllers.isEmpty
   
   def forceFinish() {
-    controllers.foreach(_.forceFinish)
-    controllers.clear
+    controllers.foreach(_.forceFinish())
+    controllers.clear()
   }
 }
 
 class ControllerSet[T <: Updateable](controllers0: Controller[T]*) extends Controller[T] {
   protected var controllers = new ListBuffer[Controller[T]]()
-  controllers0 foreach add
   
   def add(controller: Controller[T]) {
     controllers += controller
   }
   
   override def update(elapsed: Long @@ Milliseconds) {
+    super.update(elapsed)
+    
     if (!controllers.isEmpty) {
       controllers.foreach(_.update(elapsed))
       val (finished, notFinished) = controllers.partition(_.finished)
-      finished.foreach(_.onEnd)
+      finished.foreach(_.onEnd())
       controllers = notFinished
     }
   }
   
   override def onStart() {
     super.onStart()
+    
+    controllers0 foreach add
+    
     controllers foreach (_.target = target)
     
-    controllers.foreach(_.onStart)
+    controllers.foreach(_.onStart())
   }
   
   def finished() = controllers.isEmpty
   
   def forceFinish() {
-    controllers.foreach(_.forceFinish)
-    controllers.clear
+    controllers.foreach(_.forceFinish())
+    controllers.clear()
+  }
+}
+
+/**
+ * The ControllerLoop keeps executing the same controller over and over again. In order for that to work
+ * controllers must be reset with the onStart() method. The only way for this controller to end is using forceFinish().
+ */
+class ControllerLoop[T <: Updateable](protected val controller: Controller[T]) extends Controller[T] {
+  private var forcedFinish = false
+  
+  override def update(elapsed: Long @@ Milliseconds) {
+    super.update(elapsed)
+    
+    controller.update(elapsed)
+    
+    if(controller.finished) {
+      controller match {
+        case c: Overtime[_] => {
+            do {
+              c.onEnd()
+              
+              val over = c.overtime
+              c.onStart()
+              if (over > 0) {
+                c.update(over)
+              }
+            } while(c.finished)
+          } 
+        case _ => {
+            controller.onEnd()
+            controller.onStart()
+          }
+      }
+    }
+  }
+  
+  /** Called by controllee when started using controller */
+  override def onStart() {
+    super.onStart()
+    controller.target = target
+    controller.onStart()
+  }
+  
+  def finished() = forcedFinish
+  
+  def forceFinish() {
+    controller.forceFinish()
+    forcedFinish = true
+  }
+}
+
+class ControllerAction[T <: Updateable](private val f: T => Unit) extends Controller[T] with Instant[T] {
+  def forceFinish() {}
+  def finished(): Boolean = true
+  override def update(elapsed: Long @@ Milliseconds) {
+    f(target)
   }
 }
 

@@ -112,13 +112,13 @@ class ScreenTest extends Screen {
         }
       })
     
-    c.setController(new ControllerQueue(
+    c.setController(new ControllerLoop(new ControllerQueue(
         new MoveTo(Point2D(200, 0), tag[Milliseconds](1000L)),
         new MoveTo(Point2D(200, 200), tag[Milliseconds](1000L)),
         new MoveTo(Point2D(0, 200), tag[Milliseconds](1000L)),
         new MoveTo(Point2D(0, 0), tag[Milliseconds](1000L)),
         new MoveTo(Point2D(200, 200), tag[Milliseconds](1000L))
-      ))
+      )))
     
 //    addSprite(ed)
 //    addSprite(ed2)
