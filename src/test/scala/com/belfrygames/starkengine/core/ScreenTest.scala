@@ -73,7 +73,9 @@ class ScreenTest extends Screen {
     btnUpDown.setOrigin(0.5f, 0.5f)
     val btnOver = Sprite(app.res.get("eddard_over"))
     btnOver.setOrigin(0.5f, 0.5f)
-    val btn = new Button(btnUpDown, btnOver, btnUpDown, btnUpDown)
+    val btnText = new Label(Text.getText(32, "StarkButton"))
+    btnText.setOrigin(0.5f, 0.5f)
+    val btn = new Button(btnUpDown, btnOver, btnUpDown, btnUpDown, btnText)
     
     foreground.add(btn, "ed_button")
     btn.setOrigin(0.5f, 0.5f)

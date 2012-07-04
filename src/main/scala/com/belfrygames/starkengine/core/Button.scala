@@ -2,7 +2,7 @@ package com.belfrygames.starkengine.core
 
 import com.belfrygames.starkengine.tags._
 
-class Button(val up: Node, val over: Node, val down: Node, val hit: Node) extends Node {
+class Button(val up: Node, val over: Node, val down: Node, val hit: Node, val text: Node = null) extends Node {
   object ButtonState extends Enumeration {
     type ButtonState = Value
     val UP, OVER, DOWN = Value
@@ -32,6 +32,11 @@ class Button(val up: Node, val over: Node, val down: Node, val hit: Node) extend
     if (prev != current) {
       remove(prev)
       add(current, "state")
+      
+      if (text != null) {
+        remove(text)
+        add(text, "text")
+      }
     }
   }
   
