@@ -52,6 +52,7 @@ class ScreenTest extends Screen {
     val label3 = new Label(Text.getText(15, "15 Me gusta\nStark Engine\nMucho Mucho"))
     cont.add(label3, "label3")
     label3.y = -60
+    label3.x = 50
     
     label3.scaleX = 2
     label3.scaleY = 2
@@ -60,12 +61,27 @@ class ScreenTest extends Screen {
     
     val label7 = new Label(Text.getText(32, "Me gusta\nStark Engine\nMucho Mucho\nCacacacaca"))
     cont.add(label7, "label7")
-    label7.y = -240
+    label7.x = 300
+    label7.y = -200
     
     label7.scaleX = 2
     label7.scaleY = 2
     
     label7.setOrigin(0.5f, 0.5f)
+    
+    val btnUpDown = Sprite(app.res.get("eddard"))
+    btnUpDown.setOrigin(0.5f, 0.5f)
+    val btnOver = Sprite(app.res.get("eddard_over"))
+    btnOver.setOrigin(0.5f, 0.5f)
+    val btn = new Button(btnUpDown, btnOver, btnUpDown, btnUpDown)
+    
+    foreground.add(btn, "ed_button")
+    btn.setOrigin(0.5f, 0.5f)
+    btn.x = -300
+    btn.y = 100
+    btn.rotation = 120
+    btn.scaleX = 2
+    btn.scaleY = 1.5f
     
 //    label2.setController(new ControllerSet(
 //        new Scale(3f, 3f, tag[Milliseconds](5000L))
@@ -156,12 +172,12 @@ class ScreenTest extends Screen {
     
     private[this] val tmp = new Vector3
     override def touchMoved(x: Int, y: Int) = {
-      tmp.x = screenToViewPortX(x)
-      tmp.y = screenToViewPortY(y)
-      tmp.z = 0
-      cam.unproject(tmp)
-      cursor.x = tmp.x
-      cursor.y = tmp.y
+//      tmp.x = screenToViewPortX(x)
+//      tmp.y = screenToViewPortY(y)
+//      tmp.z = 0
+//      cam.unproject(tmp)
+//      cursor.x = tmp.x
+//      cursor.y = tmp.y
       
       false
     }

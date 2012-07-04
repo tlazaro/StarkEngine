@@ -37,10 +37,21 @@ trait Node extends Drawable with Updateable with Particle with Spatial {
     }
   }
   
+  /**
+   * Does it make sense to talk about origin for Node without width and height?
+   */
   def setOrigin(xRatio: Float, yRatio: Float) {
     originfX = xRatio
     originfY = yRatio
   }
+  
+  /**
+   * Called when this node is touched or clicked
+   */
+  final def touched() {
+    onTouch()
+  }
+  var onTouch: Unit => Unit = Unit => ()
   
   def kill() {
     for(p <- parent) {
@@ -163,7 +174,7 @@ trait Node extends Drawable with Updateable with Particle with Spatial {
     renderer.rotate(0f, 0f, 1f, rotation)
     renderer.scale(scaleX, scaleY, 1f)
     
-    if (graphic != null) {
+    if (width > 0 && height > 0) {
       def bounds() {
         if (selected) {
           renderer.setColor(1f, 0f, 0f, 1f)

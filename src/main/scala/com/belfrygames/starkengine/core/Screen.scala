@@ -65,6 +65,7 @@ class Screen extends Node with Timed {
     followCam.update(tag(0))
     hudCam.cam.position.set(0, 0, 0)
     
+    app.inputs.addProcessor(new ScreenDefeaultInputController())
     app.inputs.addProcessor(new ScreenDebugKeysController())
     
     created = true
@@ -206,5 +207,19 @@ class ScreenDebugKeysController extends InputAdapter {
     }
 
     false
+  }
+}
+
+class ScreenDefeaultInputController extends InputAdapter {
+  import com.badlogic.gdx.Input.Keys._
+
+  override def touchDown(x: Int, y: Int, pointer: Int, button: Int): Boolean = {
+    TouchEvent.over match {
+      case Some(node) => {
+          node.touched()
+          true
+      }
+      case _ => false
+    }
   }
 }
