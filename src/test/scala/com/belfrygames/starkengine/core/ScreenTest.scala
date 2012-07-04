@@ -94,8 +94,14 @@ class ScreenTest extends Screen {
     
     a.setController(new ControllerQueue(
         new Rotate(90.0f, tag[Milliseconds](2000L)),
-        new Rotate(-90.0f, tag[Milliseconds](2000L))
+        new Rotate(-90.0f, tag[Milliseconds](2000L)),
+        new Move(Point2D(0, 10), tag[Milliseconds](1000L)),
+        new Move(Point2D(0, -20), tag[Milliseconds](2000L)),
+        new Move(Point2D(0, 10), tag[Milliseconds](1000L))
       ))
+    
+    a.x = 15
+    a.y = 15
     
     val b = Sprite(app.res.get("eddard"))
     b.x = 100
@@ -104,14 +110,10 @@ class ScreenTest extends Screen {
     val c = Sprite(app.res.get("eddard"))
     node.add(c, "c")
     
-    b.setController(new Controller[Updateable]{
-        def forceFinish() {}
-        def finished(): Boolean = true
-        override def update(elapsed: Long @@ Milliseconds) {
-          println("WORKED!")
-        }
-      })
+    b.setController(new ControllerAction(t => println("WORKED!!!")))
     
+    c.x = -200
+    c.y = 200
     c.setController(new ControllerLoop(new ControllerQueue(
         new MoveTo(Point2D(200, 0), tag[Milliseconds](1000L)),
         new MoveTo(Point2D(200, 200), tag[Milliseconds](1000L)),

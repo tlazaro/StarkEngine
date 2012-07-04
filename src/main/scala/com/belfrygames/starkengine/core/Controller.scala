@@ -63,6 +63,9 @@ abstract class TimedController[T <: Updateable](var duration: Long @@ Millisecon
 class NodeController(duration: Long @@ Milliseconds) extends TimedController[Node](duration) {
 }
 
+/**
+ * Given a Point2D moves the Node to that place regardless of starting position
+ */
 class MoveTo(val dest: Point2D[Float], duration0: Long @@ Milliseconds) extends TimedController[Node](duration0) {
   var start = Point2D(0.0f, 0.0f)
   override def update(elapsed: Long @@ Milliseconds) {
@@ -87,6 +90,34 @@ class MoveTo(val dest: Point2D[Float], duration0: Long @@ Milliseconds) extends 
     
     target.x = dest.x
     target.y = dest.y
+  }
+}
+
+/**
+ * Given a vector as a Point2D moves the Node across that distance from it's starting positon. 
+ */
+class Move(val vector: Point2D[Float], duration0: Long @@ Milliseconds) extends TimedController[Node](duration0) {
+  var start = Point2D(0.0f, 0.0f)
+  override def update(elapsed: Long @@ Milliseconds) {
+    super.update(elapsed)
+    
+    target.x = start.x + vector.x * fraction
+    target.y = start.y + vector.y * fraction
+  }
+  
+  /** Called by controllee when started using controller */
+  override def onStart() {
+    super.onStart()
+    
+    start = Point2D(target.x, target.y)
+  }
+  
+  /** Called by controllee when finished using controller */
+  override def onEnd() {
+    super.onEnd()
+    
+    target.x = start.x + vector.x
+    target.y = start.y + vector.y
   }
 }
 
