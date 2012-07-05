@@ -36,6 +36,8 @@ trait Instant[T <: Updateable] extends Controller[T] {
 }
 
 abstract class TimedController[T <: Updateable](var duration: Long @@ Milliseconds) extends Controller[T] with Overtime[T] {
+  var interpolation: Function1[Float, Float] = x => x
+  
   var time = tag[Milliseconds](0L)
   
   override def update(elapsed: Long @@ Milliseconds) {
@@ -51,6 +53,12 @@ abstract class TimedController[T <: Updateable](var duration: Long @@ Millisecon
   /** Gets the elapsed fraction for this controller. Returns a value in the range [0.0..1.0].*/
   def fraction(): Float = time.toFloat / duration.toFloat
   
+  /**
+   * Gets the elapsed fraction after applying the interpolated function.
+   * By default uses the identity function over the linearly increasing fraction.
+   */
+  def interpolate(): Float = interpolation(fraction)
+  
   override def onStart() {
     super.onStart()
     time = tag[Milliseconds](0L)
@@ -61,6 +69,29 @@ abstract class TimedController[T <: Updateable](var duration: Long @@ Millisecon
   def forceFinish() = time = duration
 }
 
+trait Smoothstep { self: TimedController[_] =>
+  self.interpolation = x => { (x * x * (3 - 2 * x)) }
+}
+
+trait Bias { self: TimedController[_] =>
+  var bias: Float
+  self.interpolation = x => {
+    scala.math.pow(x, scala.math.log(bias) / scala.math.log(0.5f)).toFloat
+  }
+}
+
+trait Gain { self: TimedController[_] =>
+  var gain: Float
+  private def bias(b: Float, x: Float) = scala.math.pow(x, scala.math.log(b) / scala.math.log(0.5f)).toFloat
+  self.interpolation = x => {
+    if (x < 0.5f) {
+      bias(1 - gain, 2 * x) / 2f
+    } else {
+      1 - bias(1 - gain, 2 - 2 * x) / 2f
+    }
+  }
+}
+
 class NodeController(duration: Long @@ Milliseconds) extends TimedController[Node](duration) {
 }
 
@@ -68,10 +99,10 @@ class Tint(val dest: Color, duration0: Long @@ Milliseconds) extends TimedContro
   var start: Color = new Color
   override def update(elapsed: Long @@ Milliseconds) {
     super.update(elapsed)
-    target.graphic.color.a = start.a + (dest.a - start.a) * fraction
-    target.graphic.color.r = start.r + (dest.r - start.r) * fraction
-    target.graphic.color.g = start.g + (dest.g - start.g) * fraction
-    target.graphic.color.b = start.b + (dest.b - start.b) * fraction
+    target.graphic.color.a = start.a + (dest.a - start.a) * interpolate
+    target.graphic.color.r = start.r + (dest.r - start.r) * interpolate
+    target.graphic.color.g = start.g + (dest.g - start.g) * interpolate
+    target.graphic.color.b = start.b + (dest.b - start.b) * interpolate
   }
 
   /** Called by controllee when started using controller */
@@ -95,8 +126,8 @@ class MoveTo(val dest: Point2D[Float], duration0: Long @@ Milliseconds) extends 
   override def update(elapsed: Long @@ Milliseconds) {
     super.update(elapsed)
     
-    target.x = start.x + (dest.x - start.x) * fraction
-    target.y = start.y + (dest.y - start.y) * fraction
+    target.x = start.x + (dest.x - start.x) * interpolate
+    target.y = start.y + (dest.y - start.y) * interpolate
   }
   
   /** Called by controllee when started using controller */
@@ -125,8 +156,8 @@ class Move(val vector: Point2D[Float], duration0: Long @@ Milliseconds) extends 
   override def update(elapsed: Long @@ Milliseconds) {
     super.update(elapsed)
     
-    target.x = start.x + vector.x * fraction
-    target.y = start.y + vector.y * fraction
+    target.x = start.x + vector.x * interpolate
+    target.y = start.y + vector.y * interpolate
   }
   
   /** Called by controllee when started using controller */
@@ -149,7 +180,7 @@ class Rotate(val amount: Float, duration0: Long @@ Milliseconds) extends TimedCo
   var start = 0f
   override def update(elapsed: Long @@ Milliseconds) {
     super.update(elapsed)
-    target.rotation = start + amount * fraction
+    target.rotation = start + amount * interpolate
   }
   
   /** Called by controllee when started using controller */
@@ -170,8 +201,8 @@ class Scale(val scaleX: Float, val scaleY: Float, duration0: Long @@ Millisecond
   var startY = 0f
   override def update(elapsed: Long @@ Milliseconds) {
     super.update(elapsed)
-    target.scaleX = startX + startX * (scaleX - 1) * fraction
-    target.scaleY = startY + startY * (scaleY - 1) * fraction
+    target.scaleX = startX + startX * (scaleX - 1) * interpolate
+    target.scaleY = startY + startY * (scaleY - 1) * interpolate
   }
   
   /** Called by controllee when started using controller */
