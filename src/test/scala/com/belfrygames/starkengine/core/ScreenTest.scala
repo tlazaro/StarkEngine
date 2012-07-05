@@ -3,6 +3,7 @@ package com.belfrygames.starkengine.core
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.InputAdapter
 import com.badlogic.gdx.graphics.g2d.BitmapFont
+import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.math.Vector3
 import com.belfrygames.starkengine.tags._
 
@@ -48,6 +49,7 @@ class ScreenTest extends Screen {
     label2.scaleY = 2
     
     label2.setOrigin(0.5f, 0.5f)
+    label2.graphic.color = new Color(0.5f, 0.5f, 0.5f, 0.5f)
     
     val label3 = new Label(Text.getText(15, "15 Me gusta\nStark Engine\nMucho Mucho"))
     cont.add(label3, "label3")
@@ -58,6 +60,7 @@ class ScreenTest extends Screen {
     label3.scaleY = 2
     
     label3.setOrigin(1.0f, 1.0f)
+    label3.graphic.color = Color.RED
     
     val label7 = new Label(Text.getText(32, "Me gusta\nStark Engine\nMucho Mucho\nCacacacaca"))
     cont.add(label7, "label7")
@@ -68,9 +71,11 @@ class ScreenTest extends Screen {
     label7.scaleY = 2
     
     label7.setOrigin(0.5f, 0.5f)
+    label7.graphic.color = Color.GREEN
     
     val btnUpDown = Sprite(app.res.get("eddard"))
     btnUpDown.setOrigin(0.5f, 0.5f)
+    btnUpDown.graphic.color = new Color(1,1,1,0.5f)
     val btnOver = Sprite(app.res.get("eddard_over"))
     btnOver.setOrigin(0.5f, 0.5f)
     val btnText = new Label(Text.getText(32, "StarkButton"))

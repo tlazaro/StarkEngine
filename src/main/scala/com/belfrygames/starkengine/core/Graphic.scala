@@ -1,6 +1,7 @@
 package com.belfrygames.starkengine.core
 
 import com.badlogic.gdx.graphics.Texture
+import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.BitmapFont
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.g2d.TextureRegion
@@ -21,6 +22,7 @@ object Graphic {
  * This class should be extended to wrap visual primitives like a Texture, TextureRegion and BitmapFont
  */
 trait Graphic[T <: AnyRef] {
+  var color: Color = Color.WHITE // TODO: Move color to Node. Set color on spriteBatch. Have Text get Color from spritebatch
   var primitive: T
   def draw(spriteBatch: SpriteBatch, x: Float, y: Float, centerX: Float = 0, centerY: Float = 0, width: Float = width, height: Float = height, scaleX: Float = 1.0f, scaleY: Float = 1.0f, rotation: Float = 0)
   
@@ -30,8 +32,10 @@ trait Graphic[T <: AnyRef] {
 
 class Region(override var primitive: TextureRegion) extends Graphic[TextureRegion] {
   override def draw(spriteBatch: SpriteBatch, x: Float, y: Float, centerX: Float, centerY: Float, width: Float, height: Float, scaleX: Float, scaleY: Float, rotation: Float) {
-    if (primitive != null)
+    if (primitive != null) {
+      spriteBatch.setColor(color)
       spriteBatch.draw(primitive, x, y, centerX, centerY, width, height, scaleX, scaleY, rotation)
+    }
   }
   
   override def width: Float = if (primitive != null) primitive.getRegionWidth else -1
@@ -41,8 +45,10 @@ class Region(override var primitive: TextureRegion) extends Graphic[TextureRegio
 class Tex(override var primitive: Texture) extends Graphic[Texture] {
   private var region = new TextureRegion(primitive)
   override def draw(spriteBatch: SpriteBatch, x: Float, y: Float, centerX: Float, centerY: Float, width: Float, height: Float, scaleX: Float, scaleY: Float, rotation: Float) {
-    if (primitive != null)
+    if (primitive != null) {
+      spriteBatch.setColor(color)
       spriteBatch.draw(region, x, y, centerX, centerY, width, height, scaleX, scaleY, rotation)
+    }
   }
   
   override def width: Float = if (primitive != null) primitive.getWidth else -1
@@ -84,6 +90,7 @@ class BitmapText(private var _primitive: BitmapFont, var text: String = "") exte
       _primitive.setScale(scaleX, scaleY)
       val textx = scala.math.round(x + centerX - scaleX * centerX)
       val texty = scala.math.round(y + centerY - scaleY * centerY + height * scaleY)
+      _primitive.setColor(color)
       _primitive.drawMultiLine(spriteBatch, text, textx, texty)
     }
   }
@@ -122,6 +129,7 @@ class TrueTypeText(private var _primitive: BitmapFont, var text: String = "") ex
       _primitive.setScale(scaleX, scaleY)
       val textx = scala.math.round(x + centerX - scaleX * centerX)
       val texty = scala.math.round(y + centerY - scaleY * centerY + height * scaleY - _primitive.getLineHeight)
+      _primitive.setColor(color)
       _primitive.drawMultiLine(spriteBatch, text, textx, texty)
     }
   }
