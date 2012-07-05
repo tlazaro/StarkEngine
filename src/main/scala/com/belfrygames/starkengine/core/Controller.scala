@@ -92,6 +92,8 @@ trait Gain { self: TimedController[_] =>
   }
 }
 
+class Delay[T <: Updateable](duration: Long @@ Milliseconds) extends TimedController[T](duration)
+
 class NodeController(duration: Long @@ Milliseconds) extends TimedController[Node](duration) {
 }
 

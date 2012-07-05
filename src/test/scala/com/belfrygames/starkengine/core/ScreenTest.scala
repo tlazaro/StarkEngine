@@ -1,6 +1,5 @@
 package com.belfrygames.starkengine.core
 
-import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.InputAdapter
 import com.badlogic.gdx.graphics.g2d.BitmapFont
 import com.badlogic.gdx.graphics.Color
@@ -101,6 +100,7 @@ class ScreenTest extends Screen {
     node.add(a, "a")
     
     a.setController(new ControllerQueue(
+        new Delay(tag[Milliseconds](2000L)),
         new Rotate(90.0f, tag[Milliseconds](2000L)) with Smoothstep,
         new Rotate(-90.0f, tag[Milliseconds](2000L)) with Smoothstep,
         new Move(Point2D(0, 100), tag[Milliseconds](1000L)) with Gain { var gain = 0.8f },
