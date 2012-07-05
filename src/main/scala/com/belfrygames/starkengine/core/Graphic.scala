@@ -22,7 +22,7 @@ object Graphic {
  * This class should be extended to wrap visual primitives like a Texture, TextureRegion and BitmapFont
  */
 trait Graphic[T <: AnyRef] {
-  var color: Color = Color.WHITE // TODO: Move color to Node. Set color on spriteBatch. Have Text get Color from spritebatch
+  var color: Color = Color.WHITE.cpy // TODO: Move color to Node. Set color on spriteBatch. Have Text get Color from spritebatch
   var primitive: T
   def draw(spriteBatch: SpriteBatch, x: Float, y: Float, centerX: Float = 0, centerY: Float = 0, width: Float = width, height: Float = height, scaleX: Float = 1.0f, scaleY: Float = 1.0f, rotation: Float = 0)
   

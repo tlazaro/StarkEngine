@@ -75,7 +75,10 @@ class ScreenTest extends Screen {
     
     val btnUpDown = Sprite(app.res.get("eddard"))
     btnUpDown.setOrigin(0.5f, 0.5f)
-    btnUpDown.graphic.color = new Color(1,1,1,0.5f)
+    
+    btnUpDown.graphic.color = new Color(1,1,1,0f)    
+    btnUpDown.setController(new Tint(new Color(1,1,1,1), tag[Milliseconds](5000L)))
+    
     val btnOver = Sprite(app.res.get("eddard_over"))
     btnOver.setOrigin(0.5f, 0.5f)
     val btnText = new Label(Text.getText(32, "StarkButton"))

@@ -2,11 +2,12 @@ package com.belfrygames.starkengine.core
 
 import com.belfrygames.starkengine.tags._
 import scala.collection.mutable.ListBuffer
+import com.badlogic.gdx.graphics.Color
 
 abstract class Controller[T <: Updateable] extends Updateable {
-  private[core] var target: T = _
+  var target: T = _
   
-  def setTarget(t: T) {
+  final def setTarget(t: T) {
     target = t
   }
   
@@ -61,6 +62,29 @@ abstract class TimedController[T <: Updateable](var duration: Long @@ Millisecon
 }
 
 class NodeController(duration: Long @@ Milliseconds) extends TimedController[Node](duration) {
+}
+
+class Tint(val dest: Color, duration0: Long @@ Milliseconds) extends TimedController[Node](duration0) {
+  var start: Color = new Color
+  override def update(elapsed: Long @@ Milliseconds) {
+    super.update(elapsed)
+    target.graphic.color.a = start.a + (dest.a - start.a) * fraction
+    target.graphic.color.r = start.r + (dest.r - start.r) * fraction
+    target.graphic.color.g = start.g + (dest.g - start.g) * fraction
+    target.graphic.color.b = start.b + (dest.b - start.b) * fraction
+  }
+
+  /** Called by controllee when started using controller */
+  override def onStart() {
+    super.onStart()
+    start.set(target.graphic.color)
+  }
+
+  /** Called by controllee when finished using controller */
+  override def onEnd() {
+    super.onEnd()
+    target.graphic.color.set(dest)
+  }
 }
 
 /**
