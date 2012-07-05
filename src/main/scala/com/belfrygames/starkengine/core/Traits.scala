@@ -83,7 +83,7 @@ trait Spatial {
   def height : Float
   
   def originX = width * originfX
-  def originY = height * originfX
+  def originY = height * originfY
   
   var originfX = 0f
   var originfY = 0f
