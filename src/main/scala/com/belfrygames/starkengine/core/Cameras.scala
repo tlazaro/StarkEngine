@@ -43,11 +43,12 @@ class FollowCamera(val camera : Camera) extends AcceleratedUpdateable {
 
       dir.x = offset.x + target.x - x
       dir.y = offset.y + target.y - y
-
+      
       val distance = dir.len
-      if (distance >= FollowCamera.EPSILON) {
-        dir.nor.mul(math.min(speed, distance)).lerp(oldDir, lerp)
-
+      // We don't want to overshoot. If it's close enough it should arrive at destination
+      if (distance / speed > 1.1f) {
+        dir.nor.mul(speed).lerp(oldDir, lerp)
+      
         xSpeed = dir.x
         ySpeed = dir.y
       } else {
@@ -59,10 +60,9 @@ class FollowCamera(val camera : Camera) extends AcceleratedUpdateable {
       }
     }
   }
-
+  
   def clamp (a : Float, min : Float, max : Float) = {
-    val res = if (a <= min) min else a
-    if (res <= max) res else max
+    if (a <= min) min else if(a >= max) max else a
   }
 }
 

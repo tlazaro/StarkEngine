@@ -45,6 +45,23 @@ trait Particle {
   var x = 0.0f
   var y = 0.0f
   var z = 0.0f
+  
+  def setPos(p: Point2D[_]) {
+    val p2 = p.toFloat
+    x = p2.x
+    y = p2.y
+  }
+  
+  def setPos(x: Float, y: Float) {
+    this.x = x
+    this.y = y
+  }
+  
+  def setPos(x: Float, y: Float, z: Float) {
+    this.x = x
+    this.y = y
+    this.z = z
+  }
 }
 
 trait Dynamic extends Particle {
