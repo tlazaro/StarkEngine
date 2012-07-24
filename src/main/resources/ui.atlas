@@ -1,0 +1,75 @@
+
+ui.png
+format: RGBA8888
+filter: Nearest,Nearest
+repeat: none
+dialog_bubble
+  rotate: false
+  xy: 1, 197
+  size: 256, 256
+  orig: 256, 256
+  offset: 0, 0
+  index: -1
+gui
+  rotate: false
+  xy: 259, 197
+  size: 256, 256
+  orig: 256, 256
+  offset: 0, 0
+  index: -1
+azul
+  rotate: false
+  xy: 1, 67
+  size: 128, 128
+  orig: 128, 128
+  offset: 0, 0
+  index: -1
+rojo
+  rotate: false
+  xy: 517, 325
+  size: 128, 128
+  orig: 128, 128
+  offset: 0, 0
+  index: -1
+cursor
+  rotate: false
+  xy: 131, 67
+  size: 128, 128
+  orig: 128, 128
+  offset: 0, 0
+  index: -1
+btn_down
+  rotate: false
+  xy: 1, 1
+  size: 128, 64
+  orig: 128, 64
+  offset: 0, 0
+  index: -1
+btn_over
+  rotate: false
+  xy: 517, 259
+  size: 128, 64
+  orig: 128, 64
+  offset: 0, 0
+  index: -1
+btn_up
+  rotate: false
+  xy: 647, 389
+  size: 128, 64
+  orig: 128, 64
+  offset: 0, 0
+  index: -1
+btn_hit
+  rotate: false
+  xy: 261, 131
+  size: 128, 64
+  orig: 128, 64
+  offset: 0, 0
+  index: -1
+selection
+  rotate: false
+  xy: 131, 1
+  size: 64, 64
+  orig: 64, 64
+  offset: 0, 0
+  index: -1

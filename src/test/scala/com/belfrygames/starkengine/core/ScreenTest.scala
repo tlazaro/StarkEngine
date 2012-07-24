@@ -183,7 +183,7 @@ class ScreenTest extends Screen {
     }
     
     private[this] val tmp = new Vector3
-    override def touchMoved(x: Int, y: Int) = {
+    override def mouseMoved(x: Int, y: Int) = {
 //      tmp.x = screenToViewPortX(x)
 //      tmp.y = screenToViewPortY(y)
 //      tmp.z = 0

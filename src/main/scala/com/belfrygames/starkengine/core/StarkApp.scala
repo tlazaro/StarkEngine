@@ -34,7 +34,7 @@ object StarkApp {
   }
 }
 
-class StarkApp private(val config: Config) extends ApplicationListener with Updateable with Timed {
+class StarkApp protected(val config: Config) extends ApplicationListener with Updateable with Timed {
   var resizePolicy: ResizePolicy = FitScreen
   private[this] var targetWidth = 0
   private[this] var targetHeight = 0
@@ -59,13 +59,19 @@ class StarkApp private(val config: Config) extends ApplicationListener with Upda
   
   protected[this] val timer = new StopWatch
   
-  def create() {
+  final def create() {
     Gdx.app.log("StarkApp", "Created Stark App")
     
     Gdx.input.setInputProcessor(inputs)
     inputs.addProcessor(new DebugKeysController(this))
     
     config.resources.initialize()
+    
+    startFirstScreen()
+  }
+  
+  /** Override to add stuff before loading first screen. */
+  def startFirstScreen() {
     screen = config.firstScreen
     timer.measure()
   }
