@@ -133,7 +133,7 @@ class DebugKeysController(app: StarkApp) extends InputAdapter {
   var oldX = 0
   var oldY = 0
   
-  override def touchMoved(x: Int, y: Int) = {
+  override def mouseMoved(x: Int, y: Int) = {
     app.screen.pick(x, y)
     false
   }

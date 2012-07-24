@@ -129,8 +129,8 @@ object InputManager extends InputProcessor {
   }
 
   override def touchDragged (x: Int, y: Int, pointer: Int): Boolean = {
-    touchMoved(x, y)
+    mouseMoved(x, y)
   }
-  override def touchMoved (x: Int, y: Int): Boolean = false
+  override def mouseMoved (x: Int, y: Int): Boolean = false
   override def scrolled (amount: Int): Boolean = false
 }
