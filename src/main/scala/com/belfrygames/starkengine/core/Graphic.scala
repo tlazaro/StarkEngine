@@ -56,7 +56,8 @@ class Tex(override var primitive: Texture) extends Graphic[Texture] {
 }
 
 object Text {
-  val FONT_CHARACTERS = """abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789][_!$%#@|\/?-+=()*&.;,{}"´`'<>"""
+  val FONT_CHARACTERS =
+    """abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789][_¡!$%#@|\/¿?-+=()*&.;:,{}"´`'<>áéíóúüÁÉÍÓÚÜñÑ"""
   
   def getText(pixelSize: Int, text: String): TrueTypeText = {
     new TrueTypeText(getFont(pixelSize), text)

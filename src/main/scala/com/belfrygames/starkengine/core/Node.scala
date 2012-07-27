@@ -59,11 +59,17 @@ trait Node extends Drawable with Updateable with Particle with Spatial {
     }
   }
   
-  def isOver(pickX: Float, pickY: Float): Boolean = {
-    if (width <= 0 || height <= 0) {
-      return false
+  protected def isOverChildren(pickX: Float, pickY: Float): Option[Node] = {
+    for (child <- getChildren.reverse) {
+      child.isOver(pickX, pickY) match {
+        case s @ Some(node) => return s
+        case _ =>
+      }
     }
-    
+    return None
+  }
+  
+  def isOver(pickX: Float, pickY: Float): Option[Node] = {
     val m = Node.matrixes.obtain().idt()
     m.scale(1 / scaleX, 1 / scaleY, 1f)
     m.rotate(0, 0, 1f, -rotation)
@@ -75,12 +81,27 @@ trait Node extends Drawable with Updateable with Particle with Spatial {
     tmp.z = 0
     tmp.mul(m)
     
-    val res = between(tmp.x, -(originX + xOffset), -(originX + xOffset) + width) &&
-    between(tmp.y, -(originY + yOffset), -(originY + yOffset) + height)
-    
     Node.matrixes.free(m)
+    
+    val result = if (width <= 0 || height <= 0) {
+      isOverChildren(tmp.x, tmp.y)
+    } else {
+      val res = between(tmp.x, -(originX), -(originX) + width) &&
+      between(tmp.y, -(originY), -(originY) + height)
+    
+      if (res) {
+        isOverChildren(tmp.x, tmp.y) match {
+          case s @ Some(_) => s
+          case _ => Some(this)
+        }
+      } else {
+        None
+      }
+    }
+    
     Node.vectors.free(tmp)
-    res
+    
+    result
   }
   
   /** Adds a Node to be rendered and updated */
@@ -204,7 +225,7 @@ trait Node extends Drawable with Updateable with Particle with Spatial {
       def pointsInside() {
         renderer.begin(ShapeType.Point)
         for(x <- Range.Double.inclusive(-512, 512, 5); y <- Range.Double.inclusive(-320, 320, 5)) {
-          if (isOver(x.toFloat, y.toFloat)) {
+          if (isOver(x.toFloat, y.toFloat).isDefined) {
             renderer.setColor(1f, 0f, 0f, 0.5f)
             renderer.point(0, 0, 0)
           }

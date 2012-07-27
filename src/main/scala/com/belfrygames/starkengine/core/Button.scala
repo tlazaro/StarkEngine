@@ -18,6 +18,9 @@ class Button(val up: Node, val over: Node, val down: Node, val hit: Node, val te
   override def width = current.width
   override def height = current.height
   
+  /** Button always returns None to force the whole button to be the one receiving mouse events. */
+  override def isOverChildren(pickX: Float, pickY: Float): Option[Node] = None
+  
   // Selects the current node to display based on the state
   def updateState() {
     state = if (selected) OVER else UP
