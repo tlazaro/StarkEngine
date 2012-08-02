@@ -2,6 +2,7 @@ package com.belfrygames.starkengine.core
 
 import com.belfrygames.starkengine.tags._
 import com.badlogic.gdx.graphics.Texture
+import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.math.Matrix4
 import com.badlogic.gdx.math.Vector3
@@ -16,6 +17,14 @@ object Sprite {
   }
   def apply(texture: Texture) = {
     new Sprite(Graphic(texture))
+  }
+  
+  def rectangle(width: Float, height: Float, color: Color) = {
+    val sprite = new Sprite(Graphic.SQUARE)
+    sprite.graphic.color = color
+    sprite.scaleX = width
+    sprite.scaleY = height
+    sprite
   }
 }
 

@@ -6,14 +6,29 @@ import com.badlogic.gdx.graphics.g2d.BitmapFont
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.graphics.g2d.stbtt.TrueTypeFontFactory
+import com.badlogic.gdx.graphics.g2d.TextureAtlas
 import com.badlogic.gdx.Gdx
 
 object Graphic {
   def apply(region: TextureRegion) = {
-    new Region(region)
+    region match {
+      case t: TextureAtlas.AtlasRegion => new TextureAtlasRegion(t)
+      case t => new Region(t)
+    }
   }
+  
   def apply(texture: Texture) = {
     new Tex(texture)
+  }
+  
+  lazy val SQUARE: Graphic[_] = {
+    import com.badlogic.gdx.graphics.{ Texture, Pixmap }
+    import com.badlogic.gdx.graphics.g2d.Gdx2DPixmap
+    val pix = new Gdx2DPixmap(1, 1, Gdx2DPixmap.GDX2D_FORMAT_RGBA8888)
+    pix.clear(0xFFFFFFFF)
+    val tex = new Texture(pix.getWidth(), pix.getHeight(), Pixmap.Format.RGBA8888)
+    tex.draw(new Pixmap(pix), 0, 0)
+    new Tex(tex)
   }
 }
 
@@ -40,6 +55,19 @@ class Region(override var primitive: TextureRegion) extends Graphic[TextureRegio
   
   override def width: Float = if (primitive != null) primitive.getRegionWidth else -1
   override def height: Float = if (primitive != null) primitive.getRegionHeight else -1
+}
+
+class TextureAtlasRegion(override var primitive: TextureAtlas.AtlasRegion) extends Graphic[TextureAtlas.AtlasRegion] {
+  override def draw(spriteBatch: SpriteBatch, x: Float, y: Float, centerX: Float, centerY: Float, width: Float, height: Float, scaleX: Float, scaleY: Float, rotation: Float) {
+    if (primitive != null) {
+      spriteBatch.setColor(color)
+      spriteBatch.draw(primitive, x + primitive.offsetX, y + primitive.offsetY, centerX, centerY,
+                       primitive.packedWidth, primitive.packedHeight, scaleX, scaleY, rotation)
+    }
+  }
+  
+  override def width: Float = if (primitive != null) primitive.originalWidth else -1
+  override def height: Float = if (primitive != null) primitive.originalHeight else -1
 }
 
 class Tex(override var primitive: Texture) extends Graphic[Texture] {
