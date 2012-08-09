@@ -7,57 +7,28 @@ import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.math.Vector2
 
-object FollowCamera {
-  val EPSILON = 1.0f
-}
-
-class FollowCamera(val camera : Camera) extends AcceleratedUpdateable {
+class FollowCamera(val camera : Camera) extends Updateable {
   var target : Particle = _
   val offset = new Vector2(0.0f, 0.0f)
-
+  var lerpCoef = 0.1f
   var minX = 0.0f
   var minY = 0.0f
   var maxX = Float.MaxValue
   var maxY = Float.MaxValue
-
-  val speed = 0.5f
-  var lerp = 0.9f
-
-  val oldDir = new Vector2(0.0f, 0.0f)
-  val dir = new Vector2(0.0f, 0.0f)
+  var x = 0.0f
+  var y = 0.0f
 
   override def update(elapsed : Long @@ Milliseconds) {
-    super.update(elapsed)
-    
+    //super.update(elapsed)
     camera.update()
-
-    x = clamp(x, minX, maxX)
-    y = clamp(y, minY, maxY)
-
+    
     if (target != null) {
+      x = (offset.x + target.x) * lerpCoef + x * (1 - lerpCoef)
+      y = (offset.y + target.y) * lerpCoef + y * (1 - lerpCoef)
+      x = clamp(x, minX, maxX)
+      y = clamp(y, minY, maxY)  
       camera.position.x = x
       camera.position.y = y
-
-      oldDir.x = dir.x
-      oldDir.y = dir.y
-
-      dir.x = offset.x + target.x - x
-      dir.y = offset.y + target.y - y
-      
-      val distance = dir.len
-      // We don't want to overshoot. If it's close enough it should arrive at destination
-      if (distance / speed > 1.1f) {
-        dir.nor.mul(speed).lerp(oldDir, lerp)
-      
-        xSpeed = dir.x
-        ySpeed = dir.y
-      } else {
-        x = offset.x + target.x
-        y = offset.y + target.y
-        
-        xSpeed = 0
-        ySpeed = 0
-      }
     }
   }
   
