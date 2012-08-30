@@ -3,7 +3,7 @@ import sbt._, Keys._, Path._
 object ProjectDefinition extends Build {
   lazy val root = Project("StarkEngine", file(".")) settings(publishSettings ++ Seq(
       libraryDependencies ++= Seq(
-        "org.scalatest" %% "scalatest" % "1.7.1" % "test"
+        "org.scalatest" %% "scalatest" % "1.8" % "test"
       ),
       fork in test := true
     ) :_*)

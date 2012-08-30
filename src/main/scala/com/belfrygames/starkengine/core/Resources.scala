@@ -14,6 +14,7 @@ import com.badlogic.gdx.graphics.g2d.TextureAtlas
 import com.badlogic.gdx.Gdx
 import java.io.File
 import scala.io.Source
+import java.io.FileNotFoundException
 
 object Resources {
   def loadWithFileHandle(file : FileHandle, width: Int = -1, height: Int = -1, x: Int = 0, y: Int = 0) : TextureRegion = {
@@ -80,6 +81,16 @@ object Resources {
   
   def loadWithFile(file : File, width: Int = -1, height: Int = -1, x: Int = 0, y: Int = 0) : TextureRegion = {
     Resources.loadWithFileHandle(new FileHandle(file), width, height, x, y)
+  }
+  
+  def loadAnim(name : String) : Either[Throwable, Seq[TextureAtlas.AtlasRegion]] = {
+    val path = name.split("/")
+    atlases.get(path.head) match {
+      case Some(atlas) =>
+        val name = path.tail.mkString("/")
+        Right(atlas.findRegions(name).items.toSeq.map(_.asInstanceOf[TextureAtlas.AtlasRegion]))
+      case _ => Left(new FileNotFoundException("Could not find: " + name))
+    }
   }
   
   def load(name : String, width: Int = -1, height: Int = -1, x: Int = 0, y: Int = 0) : TextureRegion = {
