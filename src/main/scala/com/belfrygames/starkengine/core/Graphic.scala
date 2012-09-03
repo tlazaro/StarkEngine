@@ -117,8 +117,8 @@ class BitmapText(private var _primitive: BitmapFont, var text: String = "") exte
   override def draw(spriteBatch: SpriteBatch, x: Float, y: Float, centerX: Float, centerY: Float, width: Float, height: Float, scaleX: Float, scaleY: Float, rotation: Float) {
     if (_primitive != null) {
       _primitive.setScale(scaleX, scaleY)
-      val textx = scala.math.round(x + centerX - scaleX * centerX)
-      val texty = scala.math.round(y + centerY - scaleY * centerY + height * scaleY)
+      val textx = x + centerX - scaleX * centerX
+      val texty = y + centerY - scaleY * centerY + height * scaleY
       _primitive.setColor(color)
       _primitive.drawMultiLine(spriteBatch, text, textx, texty)
     }
@@ -156,8 +156,8 @@ class TrueTypeText(private var _primitive: BitmapFont, var text: String = "") ex
   override def draw(spriteBatch: SpriteBatch, x: Float, y: Float, centerX: Float, centerY: Float, width: Float, height: Float, scaleX: Float, scaleY: Float, rotation: Float) {
     if (_primitive != null) {
       _primitive.setScale(scaleX, scaleY)
-      val textx = scala.math.round(x + centerX - scaleX * centerX)
-      val texty = scala.math.round(y + centerY - scaleY * centerY + height * scaleY - _primitive.getLineHeight)
+      val textx = x + centerX - scaleX * centerX
+      val texty = y + centerY - scaleY * centerY + height * scaleY - _primitive.getLineHeight
       _primitive.setColor(color)
       _primitive.drawMultiLine(spriteBatch, text, textx, texty)
     }
