@@ -222,6 +222,30 @@ class Scale(val scaleX: Float, val scaleY: Float, duration0: Long @@ Millisecond
   }
 }
 
+class AbsoluteScale(val scaleStart: (Float, Float), val scaleEnd: (Float, Float), duration0: Long @@ Milliseconds) extends TimedController[Node](duration0) {
+  var startX = 0f
+  var startY = 0f
+  override def update(elapsed: Long @@ Milliseconds) {
+    super.update(elapsed)
+    target.scaleX = startX + (scaleEnd._1 - startX) * interpolate
+    target.scaleY = startY + (scaleEnd._2 - startY) * interpolate
+  }
+  
+  /** Called by controllee when started using controller */
+  override def onStart() {
+    super.onStart()
+    startX = scaleStart._1
+    startY = scaleStart._2
+  }
+  
+  /** Called by controllee when finished using controller */
+  override def onEnd() {
+    super.onEnd()
+    target.scaleX = scaleEnd._1
+    target.scaleY = scaleEnd._2
+  }
+}
+
 class ControllerQueue[T <: Updateable](controllers0: Controller[T]*) extends Controller[T] {
   protected val controllers = new ListBuffer[Controller[T]]()
   
