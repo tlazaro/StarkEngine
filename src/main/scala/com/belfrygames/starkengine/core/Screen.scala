@@ -12,6 +12,7 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.math.Vector3
 import scala.collection.mutable.ArrayBuffer
+import com.badlogic.gdx.graphics.Camera
 
 object Screen {
   var DEBUG = false
@@ -20,126 +21,139 @@ object Screen {
 
 class Screen extends Node with Timed {
   import Screen._
-  
+
   var app: StarkApp = _
   lazy val cam = new OrthographicCamera(app.config.width, app.config.height)
   lazy val followCam = new FollowCamera(cam)
-  
-  lazy val hudCam = new ScreenCam(new OrthographicCamera(app.config.width, app.config.height)) {
-    cam.position.set(app.config.width / 2, app.config.height / 2, 0)
-    cam.update()
+
+  lazy val hudCam = new OrthographicCamera(app.config.width, app.config.height) {
+    position.set(app.config.width / 2, app.config.height / 2, 0)
+    update()
   }
-  
+
   protected var created = false
   def isCreated() = created
-  
+
   protected[this] val renderables = new ArrayBuffer[Drawable]
   protected[this] val specialRenderables = new ArrayBuffer[Drawable]
-  
-  protected[this] lazy val spriteBatch  = new SpriteBatch()
+
+  protected[this] lazy val spriteBatch = new SpriteBatch()
   private[this] lazy val font = new BitmapFont()
-  
+
   private lazy val debugRenderer = new ShapeRenderer()
-  
+
   lazy val foreground = new Layer(cam)
-  lazy val hud: Layer = new Layer(new OrthographicCamera(app.config.width, app.config.height)){
-    cam.position.set(app.config.width / 2, app.config.height / 2, 0)
-    cam.update()
-  }
-  
+  lazy val hud: Layer = new Layer(hudCam)
+
   /** Called by StarkApp when it sets this as current screen */
   def register() {
   }
-  
+
   /** Called by StarkApp when this is the current screen and is being replaced */
   def deregister() {
   }
-  
+
   def create(app: StarkApp) {
     this.app = app
-    
+
     add(foreground, "foreground")
     add(hud, "hud")
-    
+
     cam.position.set(0, 0, 0)
     followCam.update(tag(0))
-    hudCam.cam.position.set(0, 0, 0)
-    
+    hudCam.position.set(0, 0, 0)
+
     app.inputs.addProcessor(new ScreenDefeaultInputController())
     app.inputs.addProcessor(new ScreenDebugKeysController())
-    
+
     created = true
   }
-  
+
   val tmp = new Vector3()
   val camDirection = new Vector3(1, 1, 0)
   val maxCamPosition = new Vector2(0, 0)
-  
+
   var targetWidth = 0
   var targetHeight = 0
-  
+
   def screenToViewPortX(x: Float) = {
     (x - (Gdx.graphics.getWidth - targetWidth) / 2) * (Gdx.graphics.getWidth.toFloat / targetWidth.toFloat)
   }
-  
+
   def screenToViewPortY(y: Float) = {
     (y - (Gdx.graphics.getHeight - targetHeight) / 2) * (Gdx.graphics.getHeight.toFloat / targetHeight.toFloat)
   }
-  
-  def screenToCanvas(x: Int, y: Int, result: Vector3 = null): Vector3 = {
+
+  def screenToCanvas(x: Int, y: Int, result: Vector3 = null, camera: Camera = null): Vector3 = {
     val vec = if (result == null) new Vector3 else result
     vec.x = screenToViewPortX(x)
     vec.y = screenToViewPortY(y)
     vec.z = 0
-    cam.unproject(vec)
-    vec
+    if (camera == null) {
+      vec.y = Gdx.graphics.getHeight - vec.y // Fix inverted Y-Axis
+      vec 
+    } else {
+     camera.unproject(vec)
+     vec
+    }
   }
-  
+
   def pick(x: Int, y: Int) = {
-    screenToCanvas(x, y, tmp)
-    
-    foreground.isOver(tmp.x, tmp.y) match {
-      case Some(selected) if selected != foreground => {
-          if (!selected.selected) {
-            selected.selected = true
-            selected.touchEvent = TouchEvent.Entered
-          }
-          
-          if (TouchEvent.over.isDefined) {
-            if (TouchEvent.over.get != selected) {
-              TouchEvent.over.get.selected = false
-              TouchEvent.over.get.touchEvent = TouchEvent.Exited
-              TouchEvent.over = Some(selected)
-            }
-          } else {
-            TouchEvent.over = Some(selected)
-          }
+    def select(selected: Node) {
+      if (!selected.selected) {
+        selected.selected = true
+        selected.touchEvent = TouchEvent.Entered
+      }
+
+      if (TouchEvent.over.isDefined) {
+        if (TouchEvent.over.get != selected) {
+          TouchEvent.over.get.selected = false
+          TouchEvent.over.get.touchEvent = TouchEvent.Exited
+          TouchEvent.over = Some(selected)
         }
-      case _ => {
-          TouchEvent.over foreach { n =>
-            n.selected = false
-            n.touchEvent = TouchEvent.Exited
-          }
-          TouchEvent.over = None
+      } else {
+        TouchEvent.over = Some(selected)
+      }
+    }
+
+    def clearSelection() {
+      TouchEvent.over foreach { n =>
+        n.selected = false
+        n.touchEvent = TouchEvent.Exited
+      }
+      TouchEvent.over = None
+    }
+
+    // Check hud first
+    screenToCanvas(x, y, tmp)
+    hud.isOver(tmp.x, tmp.y) match {
+      case Some(selected) if selected != hud =>
+        select(selected)
+      case _ =>
+        // Foreground converts coords
+        screenToCanvas(x, y, tmp, cam)
+        foreground.isOver(tmp.x, tmp.y) match {
+          case Some(selected) if selected != foreground => select(selected)
+          case _ => clearSelection
         }
     }
   }
-  
+
   def draw() {
     Gdx.gl.glClear(GL10.GL_COLOR_BUFFER_BIT)
-    
+
     Gdx.gl.glViewport((Gdx.graphics.getWidth - targetWidth) / 2, (Gdx.graphics.getHeight - targetHeight) / 2, targetWidth, targetHeight)
-    
+
     spriteBatch.begin()
     draw(spriteBatch)
     spriteBatch.end()
-    
+
     if (Screen.DEBUG) {
       debugDraw(debugRenderer)
     }
-    
-    Gdx.gl.glViewport(0,0, Gdx.graphics.getWidth, Gdx.graphics.getHeight)
-    
+
+    Gdx.gl.glViewport(0, 0, Gdx.graphics.getWidth, Gdx.graphics.getHeight)
+
     if (SHOW_KEYS || DEBUG) {
       spriteBatch.begin()
       if (SHOW_KEYS) {
@@ -158,7 +172,7 @@ class Screen extends Node with Timed {
       spriteBatch.end()
     }
   }
-  
+
   private[this] val keys = """Keys:
 - Tab : Toggle Debug info
 - F1 : Toggle Keys help
@@ -170,36 +184,36 @@ class Screen extends Node with Timed {
 - X or Space: Action
 - +/- Zoom in/out
 - Esc : Exit""".split("\n").view.zipWithIndex.toList
-  
-  def resume( ) { }
-  def resize(width : Int, height : Int) {
+
+  def resume() {}
+  def resize(width: Int, height: Int) {
     targetWidth = width
     targetHeight = height
-    
+
     app.resizePolicy match {
       case OriginalCanvas => {
-          cam.viewportWidth = targetWidth
-          cam.viewportHeight = targetHeight
-          hudCam.cam.viewportWidth = targetWidth
-          hudCam.cam.viewportHeight = targetHeight
-        }
+        cam.viewportWidth = targetWidth
+        cam.viewportHeight = targetHeight
+        hudCam.viewportWidth = targetWidth
+        hudCam.viewportHeight = targetHeight
+      }
       case _ => {
-          cam.viewportWidth = app.config.width
-          cam.viewportHeight = app.config.height
-          hudCam.cam.viewportWidth = app.config.width
-          hudCam.cam.viewportHeight = app.config.height
-        }
+        cam.viewportWidth = app.config.width
+        cam.viewportHeight = app.config.height
+        hudCam.viewportWidth = app.config.width
+        hudCam.viewportHeight = app.config.height
+      }
     }
   }
-  
-  def pause( ) { }
-  def dispose( ) { }
+
+  def pause() {}
+  def dispose() {}
 }
 
 class ScreenDebugKeysController extends InputAdapter {
   import com.badlogic.gdx.Input.Keys._
 
-  override def keyUp(keycode : Int) : Boolean = {
+  override def keyUp(keycode: Int): Boolean = {
     keycode match {
       case TAB => Screen.DEBUG = !Screen.DEBUG
       case F1 => Screen.SHOW_KEYS = !Screen.SHOW_KEYS
@@ -216,8 +230,8 @@ class ScreenDefeaultInputController extends InputAdapter {
   override def touchDown(x: Int, y: Int, pointer: Int, button: Int): Boolean = {
     TouchEvent.over match {
       case Some(node) => {
-          node.touched()
-          true
+        node.touched()
+        true
       }
       case _ => false
     }
