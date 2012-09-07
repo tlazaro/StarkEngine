@@ -2,11 +2,12 @@ package com.belfrygames.starkengine.core
 
 import com.belfrygames.starkengine.tags._
 
+object ButtonState extends Enumeration {
+	type ButtonState = Value
+	val UP, OVER, DOWN = Value
+}
+
 class Button(val up: Node, val over: Node, val down: Node, val hit: Node, val text: Node = null) extends Node {
-  object ButtonState extends Enumeration {
-    type ButtonState = Value
-    val UP, OVER, DOWN = Value
-  }
   import ButtonState._
   
   var state: ButtonState.Value = UP
@@ -23,8 +24,10 @@ class Button(val up: Node, val over: Node, val down: Node, val hit: Node, val te
   
   // Selects the current node to display based on the state
   def updateState() {
-    state = if (selected) OVER else UP
-    
+	if (!selected) {
+		state = UP
+	}
+	
     val prev = current
     current = state match {
       case UP => up
