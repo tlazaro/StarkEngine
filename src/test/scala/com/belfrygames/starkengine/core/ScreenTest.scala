@@ -118,7 +118,7 @@ class ScreenTest extends Screen {
     val c = Sprite(app.res.get("eddard"))
     node.add(c, "c")
     
-    b.setController(new ControllerAction(t => println("WORKED!!!")))
+    b.setController[Node](new ControllerAction(t => println("WORKED!!!")))
     
     c.x = -200
     c.y = 200

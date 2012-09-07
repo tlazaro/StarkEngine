@@ -25,6 +25,7 @@ trait Node extends Drawable with Updateable with Particle with Spatial {
   private var children = Vector[(String, Node)]()
   private var controller: Option[Controller[_ >: Node]] = None
   var touchEvent: TouchEvent.Value = TouchEvent.Empty
+  var enabled = true
 
   var graphic: Graphic[_] = null
   def width = if (graphic != null) graphic.width else -1
@@ -50,7 +51,8 @@ trait Node extends Drawable with Updateable with Particle with Spatial {
    * Called when this node is touched or clicked
    */
   final def touched() {
-    onTouch()
+    if (enabled)
+      onTouch()
   }
   var onTouch: Unit => Unit = Unit => ()
 
