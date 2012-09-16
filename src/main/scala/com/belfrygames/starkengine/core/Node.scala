@@ -9,6 +9,7 @@ import com.badlogic.gdx.utils.Pool
 import com.belfrygames.starkengine.tags._
 import com.belfrygames.starkengine.utils._
 import com.starkengine.utils.SynchronizedPool
+import com.badlogic.gdx.graphics.Color
 
 object Node {
   val matrixes = new Pool[Matrix4](10) with SynchronizedPool[Matrix4] {
@@ -28,6 +29,7 @@ trait Node extends Drawable with Updateable with Particle with Spatial {
   var enabled = true
 
   var graphic: Graphic[_] = null
+  var color: Color = Color.WHITE.cpy
   def width = if (graphic != null) graphic.width else -1
   def height = if (graphic != null) graphic.height else -1
 
@@ -178,7 +180,10 @@ trait Node extends Drawable with Updateable with Particle with Spatial {
       trans.mul(matrix)
       spriteBatch.setTransformMatrix(trans)
 
-      children foreach (_._2 redraw spriteBatch)
+      for (child <- children) {
+        spriteBatch.setColor(color)
+        child._2 redraw spriteBatch
+      }
 
       spriteBatch.setTransformMatrix(oldTrans)
       Node.matrixes.free(oldTrans)
@@ -191,8 +196,10 @@ trait Node extends Drawable with Updateable with Particle with Spatial {
 
   /** Draws this node and it's children */
   override def draw(spriteBatch: SpriteBatch) {
-    if (graphic != null)
+    if (graphic != null) {
+      spriteBatch.setColor(color)
       graphic.draw(spriteBatch, x + xOffset - originX, y + yOffset - originY, originX + xOffset, originY + yOffset, width, height, scaleX, scaleY, rotation)
+    }
 
     drawChildren(spriteBatch)
   }

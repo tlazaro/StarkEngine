@@ -101,22 +101,22 @@ class Tint(val dest: Color, duration0: Long @@ Milliseconds) extends TimedContro
   var start: Color = new Color
   override def update(elapsed: Long @@ Milliseconds) {
     super.update(elapsed)
-    target.graphic.color.a = start.a + (dest.a - start.a) * interpolate
-    target.graphic.color.r = start.r + (dest.r - start.r) * interpolate
-    target.graphic.color.g = start.g + (dest.g - start.g) * interpolate
-    target.graphic.color.b = start.b + (dest.b - start.b) * interpolate
+    target.color.a = start.a + (dest.a - start.a) * interpolate
+    target.color.r = start.r + (dest.r - start.r) * interpolate
+    target.color.g = start.g + (dest.g - start.g) * interpolate
+    target.color.b = start.b + (dest.b - start.b) * interpolate
   }
 
   /** Called by controllee when started using controller */
   override def onStart() {
     super.onStart()
-    start.set(target.graphic.color)
+    start.set(target.color)
   }
 
   /** Called by controllee when finished using controller */
   override def onEnd() {
     super.onEnd()
-    target.graphic.color.set(dest)
+    target.color.set(dest)
   }
 }
 

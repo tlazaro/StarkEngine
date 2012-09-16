@@ -48,7 +48,7 @@ class ScreenTest extends Screen {
     label2.scaleY = 2
     
     label2.setOrigin(0.5f, 0.5f)
-    label2.graphic.color = new Color(0.5f, 0.5f, 0.5f, 0.5f)
+    label2.color = new Color(0.5f, 0.5f, 0.5f, 0.5f)
     
     val label3 = new Label(Text.getText(15, "15 Me gusta\nStark Engine\nMucho Mucho"))
     cont.add(label3, "label3")
@@ -59,7 +59,7 @@ class ScreenTest extends Screen {
     label3.scaleY = 2
     
     label3.setOrigin(1.0f, 1.0f)
-    label3.graphic.color = Color.RED
+    label3.color = Color.RED
     
     val label7 = new Label(Text.getText(32, "Me gusta\nStark Engine\nMucho Mucho\nCacacacaca"))
     cont.add(label7, "label7")
@@ -70,12 +70,12 @@ class ScreenTest extends Screen {
     label7.scaleY = 2
     
     label7.setOrigin(0.5f, 0.5f)
-    label7.graphic.color = Color.GREEN
+    label7.color = Color.GREEN
     
     val btnUpDown = Sprite(app.res.get("eddard"))
     btnUpDown.setOrigin(0.5f, 0.5f)
     
-    btnUpDown.graphic.color = new Color(1,1,1,0f)    
+    btnUpDown.color = new Color(1,1,1,0f)    
     btnUpDown.setController(new Tint(new Color(1,1,1,1), tag[Milliseconds](5000L)))
     
     val btnOver = Sprite(app.res.get("eddard_over"))

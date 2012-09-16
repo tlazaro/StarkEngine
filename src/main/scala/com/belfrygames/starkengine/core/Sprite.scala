@@ -21,7 +21,7 @@ object Sprite {
   
   def rectangle(width: Float, height: Float, color: Color) = {
     val sprite = new Sprite(Graphic.SQUARE)
-    sprite.graphic.color = color
+    sprite.color = color
     sprite.scaleX = width
     sprite.scaleY = height
     sprite
