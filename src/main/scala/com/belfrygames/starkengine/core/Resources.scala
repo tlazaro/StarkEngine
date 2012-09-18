@@ -84,11 +84,13 @@ object Resources {
   }
   
   def loadAnim(name : String) : Either[Throwable, Seq[TextureAtlas.AtlasRegion]] = {
+    import scala.collection.JavaConversions._
+    
     val path = name.split("/")
     atlases.get(path.head) match {
       case Some(atlas) =>
         val name = path.tail.mkString("/")
-        Right(atlas.findRegions(name).items.toSeq.map(_.asInstanceOf[TextureAtlas.AtlasRegion]))
+        Right(atlas.findRegions(name).iterator.toSeq.map(_.asInstanceOf[TextureAtlas.AtlasRegion]))
       case _ => Left(new FileNotFoundException("Could not find: " + name))
     }
   }

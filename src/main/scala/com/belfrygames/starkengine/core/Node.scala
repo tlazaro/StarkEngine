@@ -181,7 +181,7 @@ trait Node extends Drawable with Updateable with Particle with Spatial {
       spriteBatch.setTransformMatrix(trans)
 
       for (child <- children) {
-        spriteBatch.setColor(color)
+        setDrawingColor(spriteBatch, color)
         child._2 redraw spriteBatch
       }
 
@@ -193,11 +193,15 @@ trait Node extends Drawable with Updateable with Particle with Spatial {
   final protected def debugDrawChildren(renderer: ShapeRenderer) = {
     children foreach (_._2 debugRedraw renderer)
   }
+  
+  protected def setDrawingColor(spriteBatch: SpriteBatch, color: Color) {
+    spriteBatch.setColor(color)
+  }
 
   /** Draws this node and it's children */
   override def draw(spriteBatch: SpriteBatch) {
     if (graphic != null) {
-      spriteBatch.setColor(color)
+      setDrawingColor(spriteBatch, color)
       graphic.draw(spriteBatch, x + xOffset - originX, y + yOffset - originY, originX + xOffset, originY + yOffset, width, height, scaleX, scaleY, rotation)
     }
 
