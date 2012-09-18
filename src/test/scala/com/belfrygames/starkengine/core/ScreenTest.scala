@@ -39,7 +39,7 @@ class ScreenTest extends Screen {
 //        new Rotate(360.0f, tag[Milliseconds](5000L))
 //      ))
     
-    val label2 = new Label(new BitmapText(new BitmapFont, "Me gusta\nStark Engine\nMucho Mucho\nCacacacaca"))
+    val label2 = new Label("Me gusta\nStark Engine\nMucho Mucho\nCacacacaca", new BitmapText(new BitmapFont))
     cont.add(label2, "label2")
     label2.y = -30
     label2.x = -100
@@ -50,7 +50,10 @@ class ScreenTest extends Screen {
     label2.setOrigin(0.5f, 0.5f)
     label2.color = new Color(0.5f, 0.5f, 0.5f, 0.5f)
     
-    val label3 = new Label(Text.getText(15, "15 Me gusta\nStark Engine\nMucho Mucho"))
+    val smallFont = new TrueTypeFont("com/belfrygames/starkengine/ubuntu.ttf", 15)
+    val bigFont = smallFont.newFont(32)
+    
+    val label3 = new Label("15 Me gusta\nStark Engine\nMucho Mucho", smallFont)
     cont.add(label3, "label3")
     label3.y = -60
     label3.x = 50
@@ -61,7 +64,7 @@ class ScreenTest extends Screen {
     label3.setOrigin(1.0f, 1.0f)
     label3.color = Color.RED
     
-    val label7 = new Label(Text.getText(32, "Me gusta\nStark Engine\nMucho Mucho\nCacacacaca"))
+    val label7 = new Label("Me gusta\nStark Engine\nMucho Mucho\nCacacacaca", bigFont)
     cont.add(label7, "label7")
     label7.x = 300
     label7.y = -200
@@ -80,7 +83,7 @@ class ScreenTest extends Screen {
     
     val btnOver = Sprite(app.res.get("eddard_over"))
     btnOver.setOrigin(0.5f, 0.5f)
-    val btnText = new Label(Text.getText(32, "StarkButton"))
+    val btnText = new Label("StarkButton", bigFont)
     btnText.setOrigin(0.5f, 0.5f)
     val btn = new Button(btnUpDown, btnOver, btnUpDown, btnUpDown, btnText)
     
