@@ -1,6 +1,7 @@
 package com.belfrygames.starkengine.core
 
 import com.belfrygames.starkengine.tags._
+import java.io.FileNotFoundException
 
 object ButtonState extends Enumeration {
   type ButtonState = Value
@@ -20,7 +21,26 @@ class Button(val up: Node, val over: Node, val down: Node, val disabled: Node, v
   override def height = current.height
 
   /** Button always returns None to force the whole button to be the one receiving mouse events. */
-  override def isOverChildren(pickX: Float, pickY: Float): Option[Node] = None
+  override def isOverChildren(pickX: Float, pickY: Float, strat: OverStrategy): Option[Node] = None
+  
+  override def isOverLocal(pickX: Float, pickY: Float, strat: OverStrategy): Option[Node] = {
+    if (width <= 0 || height <= 0) {
+      isOverChildren(pickX, pickY, strat)
+    } else {
+      val res = if (current.graphic != null) {
+        current.graphic.isOver(pickX + originX, pickY + originY, strat)
+      } else {
+        import com.belfrygames.starkengine.utils._
+        between(pickX, -originX, -originX + width) && between(pickY, -originY, -originY + height)
+      }
+
+      if (res) {
+        Some(this)
+      } else {
+        None
+      }
+    }
+  }
 
   // Selects the current node to display based on the state
   def updateState() {
@@ -56,7 +76,31 @@ class Button(val up: Node, val over: Node, val down: Node, val disabled: Node, v
 }
 
 object Button {
-  def apply(up: Graphic[_], over: Graphic[_], down: Graphic[_], disabled: Graphic[_], hit: Graphic[_]): Button = {
-    new Button(Sprite(up), Sprite(over), Sprite(down), Sprite(disabled), Sprite(hit))
+  def apply(up: Graphic[_], over: Graphic[_], down: Graphic[_], disabled: Graphic[_], hit: Graphic[_], text: Node = null): Button = {
+    new Button(Sprite(up), Sprite(over), Sprite(down), Sprite(disabled), Sprite(hit), text)
+  }
+
+  val suffixes = Map(
+    "up" -> List("", "up", "normal"),
+    "over" -> List("over", "mouseover", "highlight", "high"),
+    "down" -> List("down", "pressed", "pushed"),
+    "disabled" -> List("disabled", "grayed", "gray"),
+    "hit" -> List("hit", "hitarea", "mask"))
+
+  def create(id: String, text: => Node): Either[Throwable, Button] = {
+    def findSuffixes(state: String) = suffixes(state).flatMap(s => List(id + "_" + s, id + s)).find(Resources.hasImage(_))
+    def getGraphic(img: String) = Graphic(Resources.load(img))
+
+    val up = findSuffixes("up")
+    up match {
+      case Some(path) =>
+        val img = getGraphic(path)
+        val over = findSuffixes("over").map(getGraphic(_))
+        val down = findSuffixes("down").map(getGraphic(_))
+        val disabled = findSuffixes("disabled").map(getGraphic(_))
+        val hit = findSuffixes("hit").map(getGraphic(_))
+        Right(Button(img, over.getOrElse(img), down.getOrElse(img), disabled.getOrElse(img), hit.getOrElse(img), text))
+      case _ => Left(new FileNotFoundException("Image " + id + " for button not found."))
+    }
   }
 }

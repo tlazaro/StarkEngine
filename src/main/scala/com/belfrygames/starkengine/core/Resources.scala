@@ -95,7 +95,16 @@ object Resources {
     }
   }
   
-  def load(name : String, width: Int = -1, height: Int = -1, x: Int = 0, y: Int = 0) : TextureRegion = {
+  /** Return whether this image exists or not. */
+  def hasImage(name : String): Boolean = {
+    val path = name.split("/")
+    atlases.get(path.head) match {
+      case Some(atlas) =>  atlas.findRegion(path.drop(1).mkString("/")) != null
+      case _ => getAsset[Texture](name) != null
+    }
+  }
+  
+  def load(name : String, width: Int = -1, height: Int = -1, x: Int = 0, y: Int = 0): TextureRegion = {
     val path = name.split("/")
     atlases.get(path.head) match {
       case Some(atlas) => {

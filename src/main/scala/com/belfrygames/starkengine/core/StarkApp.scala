@@ -3,6 +3,7 @@ package com.belfrygames.starkengine.core
 import com.badlogic.gdx.{ InputMultiplexer, InputAdapter, Input, Gdx, ApplicationListener }
 import com.belfrygames.starkengine.tags._
 import com.belfrygames.starkengine.utils.StopWatch
+import com.badlogic.gdx.graphics.GL10
 
 sealed trait ResizePolicy
 case object FitScreen extends ResizePolicy
@@ -73,6 +74,7 @@ class StarkApp protected (val config: Config) extends ApplicationListener with U
   }
 
   final def render(): Unit = synchronized {
+    Gdx.gl.glClear(GL10.GL_COLOR_BUFFER_BIT)
     screen.draw()
     nanoUpdate(timer.measure())
   }

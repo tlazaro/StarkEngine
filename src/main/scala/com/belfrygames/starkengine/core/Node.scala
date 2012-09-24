@@ -64,9 +64,9 @@ trait Node extends Drawable with Updateable with Particle with Spatial {
     }
   }
 
-  protected def isOverChildren(pickX: Float, pickY: Float): Option[Node] = {
+  protected def isOverChildren(pickX: Float, pickY: Float, strat: OverStrategy): Option[Node] = {
     for (child <- getChildren.reverse) {
-      child.isOver(pickX, pickY) match {
+      child.isOver(pickX, pickY, strat) match {
         case s @ Some(node) => return s
         case _ =>
       }
@@ -74,7 +74,28 @@ trait Node extends Drawable with Updateable with Particle with Spatial {
     return None
   }
 
-  def isOver(pickX: Float, pickY: Float): Option[Node] = {
+  def isOverLocal(pickX: Float, pickY: Float, strat: OverStrategy): Option[Node] = {
+    if (width <= 0 || height <= 0) {
+      isOverChildren(pickX, pickY, strat)
+    } else {
+      val res = if (graphic != null) {
+        graphic.isOver(pickX - originX, pickY - originY, strat)
+      } else {
+        between(pickX, -originX, -originX + width) && between(pickY, -originY, -originY + height)
+      }
+
+      if (res) {
+        isOverChildren(pickX, pickY, strat) match {
+          case s @ Some(_) => s
+          case _ => Some(this)
+        }
+      } else {
+        None
+      }
+    }
+  }
+
+  def isOver(pickX: Float, pickY: Float, strat: OverStrategy = Contents): Option[Node] = {
     val m = Node.matrixes.obtain().idt()
     m.scale(1 / scaleX, 1 / scaleY, 1f)
     m.rotate(0, 0, 1f, -rotation)
@@ -88,25 +109,10 @@ trait Node extends Drawable with Updateable with Particle with Spatial {
 
     Node.matrixes.free(m)
 
-    val result = if (width <= 0 || height <= 0) {
-      isOverChildren(tmp.x, tmp.y)
-    } else {
-      val res = between(tmp.x, -(originX), -(originX) + width) &&
-        between(tmp.y, -(originY), -(originY) + height)
-
-      if (res) {
-        isOverChildren(tmp.x, tmp.y) match {
-          case s @ Some(_) => s
-          case _ => Some(this)
-        }
-      } else {
-        None
-      }
-    }
-
+    val tempx = tmp.x
+    val tempy = tmp.y
     Node.vectors.free(tmp)
-
-    result
+    isOverLocal(tempx, tempy, strat)
   }
 
   /** Adds a Node to be rendered and updated */
@@ -193,7 +199,7 @@ trait Node extends Drawable with Updateable with Particle with Spatial {
   final protected def debugDrawChildren(renderer: ShapeRenderer) = {
     children foreach (_._2 debugRedraw renderer)
   }
-  
+
   protected def setDrawingColor(spriteBatch: SpriteBatch, color: Color) {
     spriteBatch.setColor(color)
   }
@@ -209,6 +215,49 @@ trait Node extends Drawable with Updateable with Particle with Spatial {
   }
 
   override def debugDraw(renderer: ShapeRenderer) {
+    def drawRect(rect: Rectangle[Float]) {
+      renderer.begin(ShapeType.Rectangle)
+      renderer.rect(-originX + rect.x0, -originY + rect.y0, rect.width, rect.height)
+      renderer.end()
+    }
+
+    def bounds() {
+      if (graphic != null) {
+        if (selected) {
+          renderer.setColor(1f, 1f, 0f, 1f)
+        } else {
+          renderer.setColor(0f, 1f, 0f, 1f)
+        }
+        drawRect(graphic.bounds)
+      }
+    }
+
+    def contents() {
+      if (graphic != null) {
+        renderer.setColor(1f, 0f, 0f, 1f)
+        drawRect(graphic.contents)
+      }
+    }
+
+    def cross() {
+      renderer.setColor(1f, 1f, 1f, 1f)
+      renderer.begin(ShapeType.Line)
+      renderer.line(-5, -5, 5, 5)
+      renderer.line(-5, 5, 5, -5)
+      renderer.end()
+    }
+
+    def pointsInside() {
+      renderer.begin(ShapeType.Point)
+      for (x <- Range.Double.inclusive(-512, 512, 5); y <- Range.Double.inclusive(-320, 320, 5)) {
+        if (isOver(x.toFloat, y.toFloat).isDefined) {
+          renderer.setColor(1f, 0f, 0f, 0.5f)
+          renderer.point(0, 0, 0)
+        }
+      }
+      renderer.end()
+    }
+
     val transX = x + xOffset
     val transY = y + yOffset
 
@@ -217,37 +266,8 @@ trait Node extends Drawable with Updateable with Particle with Spatial {
     renderer.scale(scaleX, scaleY, 1f)
 
     if (width > 0 && height > 0) {
-      def bounds() {
-        if (selected) {
-          renderer.setColor(1f, 0f, 0f, 1f)
-        } else {
-          renderer.setColor(0f, 1f, 0f, 1f)
-        }
-        renderer.begin(ShapeType.Rectangle)
-        renderer.rect(-(originX + xOffset), -(originY + yOffset), width, height)
-        renderer.end()
-      }
-
-      def cross() {
-        renderer.setColor(1f, 1f, 1f, 1f)
-        renderer.begin(ShapeType.Line)
-        renderer.line(-5, -5, 5, 5)
-        renderer.line(-5, 5, 5, -5)
-        renderer.end()
-      }
-
-      def pointsInside() {
-        renderer.begin(ShapeType.Point)
-        for (x <- Range.Double.inclusive(-512, 512, 5); y <- Range.Double.inclusive(-320, 320, 5)) {
-          if (isOver(x.toFloat, y.toFloat).isDefined) {
-            renderer.setColor(1f, 0f, 0f, 0.5f)
-            renderer.point(0, 0, 0)
-          }
-        }
-        renderer.end()
-      }
-
       bounds()
+      contents()
       cross()
     }
 

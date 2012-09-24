@@ -140,8 +140,6 @@ class Screen extends Node with Timed {
   }
 
   def draw() {
-    Gdx.gl.glClear(GL10.GL_COLOR_BUFFER_BIT)
-
     Gdx.gl.glViewport((Gdx.graphics.getWidth - targetWidth) / 2, (Gdx.graphics.getHeight - targetHeight) / 2, targetWidth, targetHeight)
 
     spriteBatch.begin()
