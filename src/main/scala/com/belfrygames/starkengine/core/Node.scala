@@ -18,6 +18,16 @@ object Node {
   val vectors = new Pool[Vector3](10) with SynchronizedPool[Vector3] {
     override protected def newObject() = new Vector3()
   }
+  
+  val CENTER = Point2D(0.5f, 0.5f)
+  val NORTH = Point2D(0.5f, 1f)
+  val NORTH_EAST = Point2D(1f, 1f)
+  val EAST = Point2D(1f, 0.5f)
+  val SOUTH_EAST = Point2D(1f, 0f)
+  val SOUTH = Point2D(0.5f, 0f)
+  val SOUTH_WEST = Point2D(0f, 0f)
+  val WEST = Point2D(0f, 0.5f)
+  val NORTH_WEST = Point2D(0, 1f)
 }
 
 /** Node is the basic element to build from that can be displayed and updated on the screen */
@@ -42,11 +52,19 @@ trait Node extends Drawable with Updateable with Particle with Spatial {
   }
 
   /**
+   * Sets origin ratio for this Node.
    * Does it make sense to talk about origin for Node without width and height?
    */
   def setOrigin(xRatio: Float, yRatio: Float) {
     originfX = xRatio
     originfY = yRatio
+  }
+
+  /**
+   * Sets origin ratio for this Node.
+   */
+  def setOrigin(ratio: Point2D[Float]) {
+    setOrigin(ratio.x, ratio.y)
   }
 
   /**
