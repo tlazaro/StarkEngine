@@ -27,11 +27,13 @@ object Graphic {
     new Tex(texture)
   }
 
-  lazy val SQUARE: Graphic[_] = {
+  lazy val SQUARE: Graphic[_] = createRectangle(1, 1)
+
+  def createRectangle(width: Int, height: Int, color: Color = Color.WHITE): Graphic[_] = {
     import com.badlogic.gdx.graphics.{ Texture, Pixmap }
     import com.badlogic.gdx.graphics.g2d.Gdx2DPixmap
-    val pix = new Gdx2DPixmap(1, 1, Gdx2DPixmap.GDX2D_FORMAT_RGBA8888)
-    pix.clear(0xFFFFFFFF)
+    val pix = new Gdx2DPixmap(width, height, Gdx2DPixmap.GDX2D_FORMAT_RGBA8888)
+    pix.clear(Color.rgba8888(color))
     val tex = new Texture(pix.getWidth(), pix.getHeight(), Pixmap.Format.RGBA8888)
     tex.draw(new Pixmap(pix), 0, 0)
     new Tex(tex)
