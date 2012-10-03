@@ -18,7 +18,7 @@ object Node {
   val vectors = new Pool[Vector3](10) with SynchronizedPool[Vector3] {
     override protected def newObject() = new Vector3()
   }
-  
+
   val CENTER = Point2D(0.5f, 0.5f)
   val NORTH = Point2D(0.5f, 1f)
   val NORTH_EAST = Point2D(1f, 1f)
@@ -74,7 +74,7 @@ trait Node extends Drawable with Updateable with Particle with Spatial {
     if (enabled)
       onTouch()
   }
-  var onTouch: Unit => Unit = Unit => ()
+  var onTouch: () => Unit = () => ()
 
   def kill() {
     for (p <- parent) {
@@ -85,30 +85,23 @@ trait Node extends Drawable with Updateable with Particle with Spatial {
   protected def isOverChildren(pickX: Float, pickY: Float, strat: OverStrategy): Option[Node] = {
     for (child <- getChildren.reverse) {
       child.isOver(pickX, pickY, strat) match {
-        case s @ Some(node) => return s
+        case s @ Some(_) => return s
         case _ =>
       }
     }
-    return None
+    None
   }
 
   def isOverLocal(pickX: Float, pickY: Float, strat: OverStrategy): Option[Node] = {
     if (width <= 0 || height <= 0) {
       isOverChildren(pickX, pickY, strat)
     } else {
-      val res = if (graphic != null) {
-        graphic.isOver(pickX - originX, pickY - originY, strat)
-      } else {
-        between(pickX, -originX, -originX + width) && between(pickY, -originY, -originY + height)
-      }
+      val res = graphic != null && graphic.isOver(pickX + originX, pickY + originY, strat)
 
-      if (res) {
-        isOverChildren(pickX, pickY, strat) match {
-          case s @ Some(_) => s
-          case _ => Some(this)
-        }
-      } else {
-        None
+      isOverChildren(pickX, pickY, strat) match {
+        case s @ Some(_) => s
+        case _ if res => Some(this)
+        case _ => None
       }
     }
   }

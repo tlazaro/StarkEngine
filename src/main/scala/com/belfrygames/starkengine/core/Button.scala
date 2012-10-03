@@ -13,6 +13,7 @@ class Button(val up: Node, val over: Node, val down: Node, val disabled: Node, v
 
   var state: ButtonState.Value = UP
   var current: Node = null
+  val states = up :: over :: down :: disabled :: hit :: (if (text != null) text :: Nil else Nil)
 
   /** Init */
   updateState()
@@ -20,28 +21,11 @@ class Button(val up: Node, val over: Node, val down: Node, val disabled: Node, v
   override def width = current.width
   override def height = current.height
 
-  /** Button always returns None to force the whole button to be the one receiving mouse events. */
-  override def isOverChildren(pickX: Float, pickY: Float, strat: OverStrategy): Option[Node] = None
-  
-  override def isOverLocal(pickX: Float, pickY: Float, strat: OverStrategy): Option[Node] = {
-    if (width <= 0 || height <= 0) {
-      isOverChildren(pickX, pickY, strat)
-    } else {
-      val res = if (current.graphic != null) {
-        current.graphic.isOver(pickX + originX, pickY + originY, strat)
-      } else {
-        import com.belfrygames.starkengine.utils._
-        between(pickX, -originX, -originX + width) && between(pickY, -originY, -originY + height)
-      }
-
-      if (res) {
-        Some(this)
-      } else {
-        None
-      }
-    }
+  /** Button lies if mouse is over a children to be the one receiving mouse events. */
+  override def isOverChildren(pickX: Float, pickY: Float, strat: OverStrategy): Option[Node] = {
+    super.isOverChildren(pickX, pickY, strat).map(child => this)
   }
-
+  
   // Selects the current node to display based on the state
   def updateState() {
     if (!enabled) {
