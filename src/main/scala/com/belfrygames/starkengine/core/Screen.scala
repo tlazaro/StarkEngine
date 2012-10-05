@@ -226,12 +226,6 @@ class ScreenDefeaultInputController extends InputAdapter {
   import com.badlogic.gdx.Input.Keys._
 
   override def touchDown(x: Int, y: Int, pointer: Int, button: Int): Boolean = {
-    TouchEvent.over match {
-      case Some(node) => {
-        node.touched()
-        true
-      }
-      case _ => false
-    }
+    TouchEvent.over.map(_.touched()).getOrElse(false)
   }
 }

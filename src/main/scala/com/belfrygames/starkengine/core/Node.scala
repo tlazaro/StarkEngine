@@ -28,6 +28,11 @@ object Node {
   val SOUTH_WEST = Point2D(0f, 0f)
   val WEST = Point2D(0f, 0.5f)
   val NORTH_WEST = Point2D(0, 1f)
+  
+  sealed trait Touch
+  case object Consume extends Touch
+  case object Passthrough extends Touch
+  case object Ignore extends Touch
 }
 
 /** Node is the basic element to build from that can be displayed and updated on the screen */
@@ -70,11 +75,10 @@ trait Node extends Drawable with Updateable with Particle with Spatial {
   /**
    * Called when this node is touched or clicked
    */
-  final def touched() {
-    if (enabled)
-      onTouch()
+  final def touched() = {
+    enabled && onTouch() == Node.Consume
   }
-  var onTouch: () => Unit = () => ()
+  var onTouch: () => Node.Touch = () => Node.Ignore
 
   def kill() {
     for (p <- parent) {
