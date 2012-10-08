@@ -10,6 +10,9 @@ import com.belfrygames.starkengine.tags._
 import com.belfrygames.starkengine.utils._
 import com.starkengine.utils.SynchronizedPool
 import com.badlogic.gdx.graphics.Color
+import com.badlogic.gdx.scenes.scene2d.utils.ScissorStack
+import com.badlogic.gdx.Gdx
+import com.badlogic.gdx.graphics.GL10
 
 object Node {
   val matrixes = new Pool[Matrix4](10) with SynchronizedPool[Matrix4] {
@@ -17,6 +20,9 @@ object Node {
   }
   val vectors = new Pool[Vector3](10) with SynchronizedPool[Vector3] {
     override protected def newObject() = new Vector3()
+  }
+  val rectangles = new Pool[com.badlogic.gdx.math.Rectangle](10) with SynchronizedPool[com.badlogic.gdx.math.Rectangle] {
+    override protected def newObject() = new com.badlogic.gdx.math.Rectangle()
   }
 
   val CENTER = Point2D(0.5f, 0.5f)
@@ -28,7 +34,7 @@ object Node {
   val SOUTH_WEST = Point2D(0f, 0f)
   val WEST = Point2D(0f, 0.5f)
   val NORTH_WEST = Point2D(0, 1f)
-  
+
   sealed trait Touch
   case object Consume extends Touch
   case object Passthrough extends Touch
@@ -42,19 +48,15 @@ trait Node extends Drawable with Updateable with Particle with Spatial {
   private var controller: Option[Controller[_ >: Node]] = None
   var touchEvent: TouchEvent.Value = TouchEvent.Empty
   var enabled = true
+  var clipRect: Rectangle[Float] = null
 
   var graphic: Graphic[_] = null
   var color: Color = Color.WHITE.cpy
   def width = if (graphic != null) graphic.width else -1
   def height = if (graphic != null) graphic.height else -1
 
-  /** Returns the top most Node. It may return 'this' if it has no parent */
-  def root: Node = {
-    parent match {
-      case Some(p) => p.root
-      case _ => this
-    }
-  }
+  /** Returns the top most Node. It will return 'this' if it has no parent */
+  def root: Node = parent.map(_.root).getOrElse(this)
 
   /**
    * Sets origin ratio for this Node.
@@ -70,6 +72,10 @@ trait Node extends Drawable with Updateable with Particle with Spatial {
    */
   def setOrigin(ratio: Point2D[Float]) {
     setOrigin(ratio.x, ratio.y)
+  }
+
+  def clearClipping() {
+    clipRect = null
   }
 
   /**
@@ -219,11 +225,45 @@ trait Node extends Drawable with Updateable with Particle with Spatial {
     spriteBatch.setColor(color)
   }
 
+  private def findLayer: Option[Layer] = {
+    if (this.isInstanceOf[Layer]) {
+      Some(this.asInstanceOf[Layer])
+    } else {
+      parent.flatMap(_.findLayer)
+    }
+  }
+
   /** Draws this node and it's children */
   override def draw(spriteBatch: SpriteBatch) {
     if (graphic != null) {
+      var scissors: com.badlogic.gdx.math.Rectangle = null
+      val clipped = if (clipRect != null) {
+        findLayer match {
+          case Some(layer) =>
+            spriteBatch.flush()
+            scissors = Node.rectangles.obtain()
+            val clipBounds = Node.rectangles.obtain()
+            clipBounds.set(clipRect.x0 + x + xOffset - originX, clipRect.y0 + y + yOffset - originY, clipRect.width, clipRect.height)
+            ScissorStack.calculateScissors(layer.cam, spriteBatch.getTransformMatrix(), clipBounds, scissors)
+            Node.rectangles.free(clipBounds)
+            val appliedScissors = ScissorStack.pushScissors(scissors)
+            if (!appliedScissors)
+              Node.rectangles.free(scissors)
+            appliedScissors
+          case _ => false
+        }
+      } else {
+        false
+      }
+
       setDrawingColor(spriteBatch, color)
       graphic.draw(spriteBatch, x + xOffset - originX, y + yOffset - originY, originX + xOffset, originY + yOffset, width, height, scaleX, scaleY, rotation)
+
+      if (clipped) {
+        spriteBatch.flush()
+        ScissorStack.popScissors()
+        Node.rectangles.free(scissors)
+      }
     }
 
     drawChildren(spriteBatch)
@@ -244,6 +284,13 @@ trait Node extends Drawable with Updateable with Particle with Spatial {
           renderer.setColor(0f, 1f, 0f, 1f)
         }
         drawRect(graphic.bounds)
+      }
+    }
+
+    def clip() {
+      if (clipRect != null) {
+        renderer.setColor(0f, 0f, 1f, 1f)
+        drawRect(clipRect)
       }
     }
 
@@ -283,6 +330,7 @@ trait Node extends Drawable with Updateable with Particle with Spatial {
     if (width > 0 && height > 0) {
       bounds()
       contents()
+      clip()
       cross()
     }
 
