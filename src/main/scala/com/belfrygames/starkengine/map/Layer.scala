@@ -5,7 +5,7 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import com.belfrygames.starkengine.core.Node
 
 class Layer(val name: String, private var cols: Int, private var rows: Int, val tileWidth: Int, val tileHeight: Int, var tileSet: TileSet) extends Node {
-  private var tiles = Array.ofDim[Int](cols, rows)
+  private var tiles = Array.ofDim[Int](rows, cols)
   
   def apply(x: Int, y: Int): Tile = {
     if (tileSet == null)  {
