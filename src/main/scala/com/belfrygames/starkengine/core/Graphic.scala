@@ -116,6 +116,10 @@ case object Bounds extends OverStrategy
 case object Contents extends OverStrategy
 case class Pixels(threshold: Float) extends OverStrategy
 
+sealed trait OverBehavior
+case object All extends OverBehavior
+case object OnlyEnabled extends OverBehavior
+
 /**
  * Since there is no cohesion among Libgdx primitives this class is needed.
  * This class should be extended to wrap visual primitives like a Texture, TextureRegion and BitmapFont

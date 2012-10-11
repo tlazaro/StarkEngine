@@ -22,8 +22,8 @@ class Button(val up: Node, val over: Node, val down: Node, val disabled: Node, v
   override def height = current.height
 
   /** Button lies if mouse is over a children to be the one receiving mouse events. */
-  override def isOverChildren(pickX: Float, pickY: Float, strat: OverStrategy): Option[Node] = {
-    super.isOverChildren(pickX, pickY, strat).map(child => this)
+  override def isOverChildren(pickX: Float, pickY: Float, strat: OverStrategy, behavior: OverBehavior): Option[Node] = {
+    super.isOverChildren(pickX, pickY, strat, behavior).map(child => this)
   }
   
   // Selects the current node to display based on the state

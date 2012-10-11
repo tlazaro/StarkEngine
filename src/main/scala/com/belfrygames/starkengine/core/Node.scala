@@ -52,6 +52,8 @@ trait Node extends Drawable with Updateable with Particle with Spatial {
 
   var graphic: Graphic[_] = null
   var color: Color = Color.WHITE.cpy
+  var respondOver = true
+
   def width = if (graphic != null) graphic.width else -1
   def height = if (graphic != null) graphic.height else -1
 
@@ -92,9 +94,9 @@ trait Node extends Drawable with Updateable with Particle with Spatial {
     }
   }
 
-  protected def isOverChildren(pickX: Float, pickY: Float, strat: OverStrategy): Option[Node] = {
+  protected def isOverChildren(pickX: Float, pickY: Float, strat: OverStrategy, behavior: OverBehavior): Option[Node] = {
     for (child <- getChildren.reverse) {
-      child.isOver(pickX, pickY, strat) match {
+      child.isOver(pickX, pickY, strat, behavior) match {
         case s @ Some(_) => return s
         case _ =>
       }
@@ -102,13 +104,13 @@ trait Node extends Drawable with Updateable with Particle with Spatial {
     None
   }
 
-  def isOverLocal(pickX: Float, pickY: Float, strat: OverStrategy): Option[Node] = {
+  def isOverLocal(pickX: Float, pickY: Float, strat: OverStrategy, behavior: OverBehavior): Option[Node] = {
     if (width <= 0 || height <= 0) {
-      isOverChildren(pickX, pickY, strat)
+      isOverChildren(pickX, pickY, strat, behavior)
     } else {
       val res = graphic != null && graphic.isOver(pickX + originX, pickY + originY, strat)
 
-      isOverChildren(pickX, pickY, strat) match {
+      isOverChildren(pickX, pickY, strat, behavior) match {
         case s @ Some(_) => s
         case _ if res => Some(this)
         case _ => None
@@ -116,24 +118,31 @@ trait Node extends Drawable with Updateable with Particle with Spatial {
     }
   }
 
-  def isOver(pickX: Float, pickY: Float, strat: OverStrategy = Contents): Option[Node] = {
-    val m = Node.matrixes.obtain().idt()
-    m.scale(1 / scaleX, 1 / scaleY, 1f)
-    m.rotate(0, 0, 1f, -rotation)
-    m.translate(-(x + xOffset), -(y + yOffset), 0f)
+  def isOver(pickX: Float, pickY: Float, strat: OverStrategy = Contents, behavior: OverBehavior = All): Option[Node] = {
+    def isOver0 = {
+      val m = Node.matrixes.obtain().idt()
+      m.scale(1 / scaleX, 1 / scaleY, 1f)
+      m.rotate(0, 0, 1f, -rotation)
+      m.translate(-(x + xOffset), -(y + yOffset), 0f)
 
-    val tmp = Node.vectors.obtain()
-    tmp.x = pickX
-    tmp.y = pickY
-    tmp.z = 0
-    tmp.mul(m)
+      val tmp = Node.vectors.obtain()
+      tmp.x = pickX
+      tmp.y = pickY
+      tmp.z = 0
+      tmp.mul(m)
 
-    Node.matrixes.free(m)
+      Node.matrixes.free(m)
 
-    val tempx = tmp.x
-    val tempy = tmp.y
-    Node.vectors.free(tmp)
-    isOverLocal(tempx, tempy, strat)
+      val tempx = tmp.x
+      val tempy = tmp.y
+      Node.vectors.free(tmp)
+      isOverLocal(tempx, tempy, strat, behavior)
+    }
+
+    behavior match {
+      case All => isOver0
+      case OnlyEnabled => if (respondOver) isOver0 else None
+    }
   }
 
   /** Adds a Node to be rendered and updated */

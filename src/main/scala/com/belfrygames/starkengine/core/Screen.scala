@@ -126,13 +126,13 @@ class Screen extends Node with Timed {
 
     // Check hud first
     screenToCanvas(x, y, tmp)
-    hud.isOver(tmp.x, tmp.y) match {
+    hud.isOver(tmp.x, tmp.y, Contents, OnlyEnabled) match {
       case Some(selected) if selected != hud =>
         select(selected)
       case _ =>
         // Foreground converts coords
         screenToCanvas(x, y, tmp, cam)
-        foreground.isOver(tmp.x, tmp.y) match {
+        foreground.isOver(tmp.x, tmp.y, Contents, OnlyEnabled) match {
           case Some(selected) if selected != foreground => select(selected)
           case _ => clearSelection
         }
