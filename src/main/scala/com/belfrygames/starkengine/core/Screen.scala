@@ -23,9 +23,11 @@ class Screen extends Node with Timed {
   import Screen._
 
   var app: StarkApp = _
+  // TODO make private, access only through Layer
   lazy val cam = new OrthographicCamera(app.config.width, app.config.height)
   lazy val followCam = new FollowCamera(cam)
 
+  // TODO make private, access only through Layer
   lazy val hudCam = new OrthographicCamera(app.config.width, app.config.height) {
     position.set(app.config.width / 2, app.config.height / 2, 0)
     update()
@@ -98,7 +100,7 @@ class Screen extends Node with Timed {
     }
   }
 
-  def pick(x: Int, y: Int) = {
+  def pick(x: Int, y: Int) {
     def select(selected: Node) {
       if (!selected.selected) {
         selected.selected = true
@@ -125,7 +127,7 @@ class Screen extends Node with Timed {
     }
 
     // Check hud first
-    screenToCanvas(x, y, tmp)
+    screenToCanvas(x, y, tmp, hudCam)
     hud.isOver(tmp.x, tmp.y, Contents, OnlyEnabled) match {
       case Some(selected) if selected != hud =>
         select(selected)
