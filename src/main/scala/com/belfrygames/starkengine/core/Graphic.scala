@@ -250,10 +250,10 @@ object Text {
   //    new TrueTypeText(getFont(pixelSize))
   //  }
 
-  def getFont(pixelSize: Int): BitmapFont = {
+  def getFont(pixelSize: Int, charset: String = FONT_CHARACTERS): BitmapFont = {
     val font = TrueTypeFontFactory.createBitmapFont(
       Gdx.files.internal("com/belfrygames/starkengine/ubuntu.ttf"),
-      FONT_CHARACTERS, 1024, 640, pixelSize, 1024, 640)
+      charset, 1024, 640, pixelSize, 1024, 640)
 
     font.setUseIntegerPositions(false)
     font
@@ -262,16 +262,16 @@ object Text {
 
 trait Font extends Graphic[BitmapFont] {
   var text: String
+  
+  def newFont(pixelSize: Int, charset: String = Text.FONT_CHARACTERS): Font
 }
 
 class TrueTypeFont(val path: String, val pixelSize: Int, val charset: String = Text.FONT_CHARACTERS) extends Font {
   val bitmapFont = TrueTypeFontFactory.createBitmapFont(
-    Gdx.files.internal(path),
-    charset, 1024, 640, pixelSize, 1024, 640)
-
+      Gdx.files.internal(path), charset, 1024, 640, pixelSize, 1024, 640) // TODO windows size dependency
   bitmapFont.setUseIntegerPositions(false)
 
-  def newFont(pixelSize: Int, charset: String = Text.FONT_CHARACTERS) = new TrueTypeFont(path, pixelSize, charset)
+  override def newFont(pixelSize: Int, charset: String = Text.FONT_CHARACTERS) = new TrueTypeFont(path, pixelSize, charset)
 
   private var textBounds: BitmapFont.TextBounds = null
   private[this] var currentText = ""
@@ -316,8 +316,7 @@ class BitmapText(private var _primitive: BitmapFont) extends Font {
   var currentText: String = ""
   private var textBounds: BitmapFont.TextBounds = null
 
-  primitive = _primitive
-
+  override def primitive = _primitive
   override def primitive_=(value: BitmapFont) = {
     _primitive = value
     if (_primitive != null) {
@@ -327,7 +326,8 @@ class BitmapText(private var _primitive: BitmapFont) extends Font {
       textBounds = null
     }
   }
-  override def primitive = _primitive
+  
+  override def newFont(pixelSize: Int, charset: String = Text.FONT_CHARACTERS) = new BitmapText(Text.getFont(pixelSize, charset))
 
   override def text_=(text: String) {
     if (currentText != text) {
@@ -343,47 +343,6 @@ class BitmapText(private var _primitive: BitmapFont) extends Font {
       _primitive.setScale(scaleX, scaleY)
       val textx = x + centerX - scaleX * centerX
       val texty = y + centerY - scaleY * centerY + height * scaleY
-      _primitive.drawMultiLine(spriteBatch, text, textx, texty)
-    }
-  }
-
-  override def width: Float = {
-    if (textBounds != null) {
-      (textBounds.width / _primitive.getScaleX)
-    } else -1
-  }
-
-  override def height: Float = {
-    if (_primitive != null) {
-      ((_primitive.getLineHeight * text.lines.size) / _primitive.getScaleY)
-    } else -1
-  }
-}
-
-class TrueTypeText(private var _primitive: BitmapFont) extends Font {
-  def this(font: TrueTypeFont) = this(font.bitmapFont)
-
-  override var text: String = ""
-  private var textBounds: BitmapFont.TextBounds = null
-
-  primitive = _primitive
-
-  override def primitive_=(value: BitmapFont) = {
-    _primitive = value
-    if (_primitive != null) {
-      textBounds = _primitive.getBounds(text)
-      textBounds = _primitive.getMultiLineBounds(text)
-    } else {
-      textBounds = null
-    }
-  }
-  override def primitive = _primitive
-
-  override def draw(spriteBatch: SpriteBatch, x: Float, y: Float, centerX: Float, centerY: Float, width: Float, height: Float, scaleX: Float, scaleY: Float, rotation: Float) {
-    if (_primitive != null) {
-      _primitive.setScale(scaleX, scaleY)
-      val textx = x + centerX - scaleX * centerX
-      val texty = y + centerY - scaleY * centerY + height * scaleY - _primitive.getLineHeight
       _primitive.drawMultiLine(spriteBatch, text, textx, texty)
     }
   }

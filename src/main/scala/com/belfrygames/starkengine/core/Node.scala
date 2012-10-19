@@ -51,7 +51,10 @@ trait Node extends Drawable with Updateable with Particle with Spatial {
   var clipRect: Rectangle[Float] = null
 
   var graphic: Graphic[_] = null
-  var color: Color = Color.WHITE.cpy
+  private var _color: Color = Color.WHITE.cpy
+  def color: Color = _color
+  def color_=(color: Color) { _color = color }
+  
   var respondOver = true
 
   def width = if (graphic != null) graphic.width else -1

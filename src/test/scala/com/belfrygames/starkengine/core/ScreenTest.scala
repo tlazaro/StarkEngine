@@ -39,7 +39,8 @@ class ScreenTest extends Screen {
     //        new Rotate(360.0f, tag[Milliseconds](5000L))
     //      ))
 
-    val label2 = new Label("Me gusta\nStark Engine\nMucho Mucho\nCacacacaca", new BitmapText(new BitmapFont))
+    val bitmapStyle = Style(new BitmapText(new BitmapFont), new Color(1,1,1,1))
+    val label2 = new Label("Me gusta\nStark Engine\nMucho Mucho\nCacacacaca", bitmapStyle)
     cont.add(label2, "label2")
     label2.y = -30
     label2.x = -100
@@ -50,8 +51,8 @@ class ScreenTest extends Screen {
     label2.setOrigin(0.5f, 0.5f)
     label2.color = new Color(0.5f, 0.5f, 0.5f, 0.5f)
 
-    val smallFont = new TrueTypeFont("com/belfrygames/starkengine/ubuntu.ttf", 15)
-    val bigFont = smallFont.newFont(32)
+    val smallFont = Style(new TrueTypeFont("com/belfrygames/starkengine/ubuntu.ttf", 15), new Color(1,1,1,1))
+    val bigFont = smallFont.withSize(32)
 
     val label3 = new Label("15 Me gusta\nStark Engine\nMucho Mucho", smallFont)
     cont.add(label3, "label3")
