@@ -136,7 +136,7 @@ class DebugKeysController(app: StarkApp) extends InputAdapter {
 
   override def keyUp(keycode: Int): Boolean = {
     keycode match {
-      case ESCAPE => Gdx.app.exit()
+      //case ESCAPE => Gdx.app.exit()
       case F2 => app.resizePolicy = FitScreen; app.resize(Gdx.graphics.getWidth, Gdx.graphics.getHeight)
       case F3 => app.resizePolicy = Original; app.resize(Gdx.graphics.getWidth, Gdx.graphics.getHeight)
       case F4 => app.resizePolicy = Stretch; app.resize(Gdx.graphics.getWidth, Gdx.graphics.getHeight)
