@@ -54,7 +54,7 @@ trait Node extends Drawable with Updateable with Particle with Spatial {
   private var _color: Color = Color.WHITE.cpy
   def color: Color = _color
   def color_=(color: Color) { _color = color }
-  
+
   var respondOver = true
 
   def width = if (graphic != null) graphic.width else -1
@@ -281,36 +281,42 @@ trait Node extends Drawable with Updateable with Particle with Spatial {
     drawChildren(spriteBatch)
   }
 
+  protected def bounds(renderer: ShapeRenderer) {
+    if (graphic != null) {
+      if (selected) {
+        renderer.setColor(1f, 1f, 0f, 1f)
+      } else {
+        renderer.setColor(0f, 1f, 0f, 1f)
+      }
+      drawRect(renderer, graphic.bounds)
+    }
+  }
+  
+  protected def contents(renderer: ShapeRenderer) {
+    if (graphic != null) {
+      renderer.setColor(1f, 0f, 0f, 1f)
+      drawRect(renderer, graphic.contents)
+    }
+  }
+
+  protected def clip(renderer: ShapeRenderer) {
+    if (clipRect != null) {
+      renderer.setColor(0f, 0f, 1f, 1f)
+      drawRect(renderer, clipRect)
+    }
+  }
+  
+  protected def drawRect(renderer: ShapeRenderer, rect: Rectangle[Float]) {
+    renderer.begin(ShapeType.Rectangle)
+    renderer.rect(-originX + rect.x0, -originY + rect.y0, rect.width, rect.height)
+    renderer.end()
+  }
+
   override def debugDraw(renderer: ShapeRenderer) {
     def drawRect(rect: Rectangle[Float]) {
       renderer.begin(ShapeType.Rectangle)
       renderer.rect(-originX + rect.x0, -originY + rect.y0, rect.width, rect.height)
       renderer.end()
-    }
-
-    def bounds() {
-      if (graphic != null) {
-        if (selected) {
-          renderer.setColor(1f, 1f, 0f, 1f)
-        } else {
-          renderer.setColor(0f, 1f, 0f, 1f)
-        }
-        drawRect(graphic.bounds)
-      }
-    }
-
-    def clip() {
-      if (clipRect != null) {
-        renderer.setColor(0f, 0f, 1f, 1f)
-        drawRect(clipRect)
-      }
-    }
-
-    def contents() {
-      if (graphic != null) {
-        renderer.setColor(1f, 0f, 0f, 1f)
-        drawRect(graphic.contents)
-      }
     }
 
     def cross() {
@@ -340,9 +346,9 @@ trait Node extends Drawable with Updateable with Particle with Spatial {
     renderer.scale(scaleX, scaleY, 1f)
 
     if (width > 0 && height > 0) {
-      bounds()
-      contents()
-      clip()
+      bounds(renderer)
+      contents(renderer)
+      clip(renderer)
       cross()
     }
 
