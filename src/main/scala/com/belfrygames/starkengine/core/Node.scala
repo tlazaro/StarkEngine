@@ -98,6 +98,9 @@ trait Node extends Drawable with Updateable with Particle with Spatial {
   }
 
   protected def isOverChildren(pickX: Float, pickY: Float, strat: OverStrategy, behavior: OverBehavior): Option[Node] = {
+    if (!visible)
+      return None
+      
     for (child <- getChildren.reverse) {
       child.isOver(pickX, pickY, strat, behavior) match {
         case s @ Some(_) => return s
@@ -108,6 +111,9 @@ trait Node extends Drawable with Updateable with Particle with Spatial {
   }
 
   def isOverLocal(pickX: Float, pickY: Float, strat: OverStrategy, behavior: OverBehavior): Option[Node] = {
+    if (!visible)
+      return None
+      
     if (width <= 0 || height <= 0) {
       isOverChildren(pickX, pickY, strat, behavior)
     } else {
@@ -122,6 +128,9 @@ trait Node extends Drawable with Updateable with Particle with Spatial {
   }
 
   def isOver(pickX: Float, pickY: Float, strat: OverStrategy = Contents, behavior: OverBehavior = All): Option[Node] = {
+    if (!visible)
+      return None
+      
     def isOver0 = {
       val m = Node.matrixes.obtain().idt()
       m.scale(1 / scaleX, 1 / scaleY, 1f)
