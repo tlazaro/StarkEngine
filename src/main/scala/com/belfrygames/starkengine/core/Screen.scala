@@ -215,8 +215,8 @@ class ScreenDebugKeysController extends InputAdapter {
 
   override def keyUp(keycode: Int): Boolean = {
     keycode match {
-      case TAB => Screen.DEBUG = !Screen.DEBUG
-      case F1 => Screen.SHOW_KEYS = !Screen.SHOW_KEYS
+//      case TAB => Screen.DEBUG = !Screen.DEBUG
+//      case F1 => Screen.SHOW_KEYS = !Screen.SHOW_KEYS
       case _ =>
     }
 

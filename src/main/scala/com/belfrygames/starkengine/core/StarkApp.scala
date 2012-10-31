@@ -134,42 +134,42 @@ class StarkApp protected (val config: Config) extends ApplicationListener with U
 class DebugKeysController(app: StarkApp) extends InputAdapter {
   import com.badlogic.gdx.Input.Keys._
 
-  override def keyUp(keycode: Int): Boolean = {
-    keycode match {
-      //case ESCAPE => Gdx.app.exit()
-      case F2 => app.resizePolicy = FitScreen; app.resize(Gdx.graphics.getWidth, Gdx.graphics.getHeight)
-      case F3 => app.resizePolicy = Original; app.resize(Gdx.graphics.getWidth, Gdx.graphics.getHeight)
-      case F4 => app.resizePolicy = Stretch; app.resize(Gdx.graphics.getWidth, Gdx.graphics.getHeight)
-      case F5 => app.resizePolicy = OriginalCanvas; app.resize(Gdx.graphics.getWidth, Gdx.graphics.getHeight)
-      case _ =>
-    }
+//  override def keyUp(keycode: Int): Boolean = {
+//    keycode match {
+//      //case ESCAPE => Gdx.app.exit()
+//      case F2 => app.resizePolicy = FitScreen; app.resize(Gdx.graphics.getWidth, Gdx.graphics.getHeight)
+//      case F3 => app.resizePolicy = Original; app.resize(Gdx.graphics.getWidth, Gdx.graphics.getHeight)
+//      case F4 => app.resizePolicy = Stretch; app.resize(Gdx.graphics.getWidth, Gdx.graphics.getHeight)
+//      case F5 => app.resizePolicy = OriginalCanvas; app.resize(Gdx.graphics.getWidth, Gdx.graphics.getHeight)
+//      case _ =>
+//    }
+//
+//    false
+//  }
 
-    false
-  }
-
-  var oldX = 0
-  var oldY = 0
+//  var oldX = 0
+//  var oldY = 0
 
   override def mouseMoved(x: Int, y: Int) = {
     app.screen.pick(x, y)
     false
   }
 
-  override def touchDown(x: Int, y: Int, pointer: Int, button: Int): Boolean = {
-    oldX = x
-    oldY = y
-    false
-  }
-
-  override def touchDragged(x: Int, y: Int, pointer: Int): Boolean = {
-    if (Gdx.input.isButtonPressed(Input.Buttons.RIGHT)) {
-      val pos = app.screen.cam.position
-      pos.x -= x - oldX
-      pos.y += y - oldY
-      oldX = x
-      oldY = y
-    }
-
-    false
-  }
+//  override def touchDown(x: Int, y: Int, pointer: Int, button: Int): Boolean = {
+//    oldX = x
+//    oldY = y
+//    false
+//  }
+//
+//  override def touchDragged(x: Int, y: Int, pointer: Int): Boolean = {
+//    if (Gdx.input.isButtonPressed(Input.Buttons.RIGHT)) {
+//      val pos = app.screen.cam.position
+//      pos.x -= x - oldX
+//      pos.y += y - oldY
+//      oldX = x
+//      oldY = y
+//    }
+//
+//    false
+//  }
 }
