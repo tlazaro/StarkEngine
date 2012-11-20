@@ -23,9 +23,9 @@ class Button(val up: Node, val over: Node, val down: Node, val disabled: Node, v
 
   /** Button lies if mouse is over a children to be the one receiving mouse events. */
   override def isOverChildren(pickX: Float, pickY: Float, strat: OverStrategy, behavior: OverBehavior): Option[Node] = {
-    super.isOverChildren(pickX, pickY, strat, behavior).map(child => this)
+    if (!visible) None else hit.isOver(pickX, pickY, strat, behavior).map(child => this)
   }
-  
+
   // Selects the current node to display based on the state
   def updateState() {
     if (!enabled) {
