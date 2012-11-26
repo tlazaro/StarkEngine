@@ -79,6 +79,9 @@ trait Node extends Drawable with Updateable with Particle with Spatial {
     setOrigin(ratio.x, ratio.y)
   }
 
+  def bounds: Rectangle[Float] = if (graphic == null) Rectangle.EMPTY_FLOAT else graphic.bounds.move(Point2D(-originX, -originY))
+  def contents: Rectangle[Float] = if (graphic == null) Rectangle.EMPTY_FLOAT else graphic.contents.move(Point2D(-originX, -originY))
+
   def clearClipping() {
     clipRect = null
   }
@@ -100,7 +103,7 @@ trait Node extends Drawable with Updateable with Particle with Spatial {
   protected def isOverChildren(pickX: Float, pickY: Float, strat: OverStrategy, behavior: OverBehavior): Option[Node] = {
     if (!visible)
       return None
-      
+
     for (child <- getChildren.reverse) {
       child.isOver(pickX, pickY, strat, behavior) match {
         case s @ Some(_) => return s
@@ -113,7 +116,7 @@ trait Node extends Drawable with Updateable with Particle with Spatial {
   def isOverLocal(pickX: Float, pickY: Float, strat: OverStrategy, behavior: OverBehavior): Option[Node] = {
     if (!visible)
       return None
-      
+
     if (width <= 0 || height <= 0) {
       isOverChildren(pickX, pickY, strat, behavior)
     } else {
@@ -130,7 +133,7 @@ trait Node extends Drawable with Updateable with Particle with Spatial {
   def isOver(pickX: Float, pickY: Float, strat: OverStrategy = Contents, behavior: OverBehavior = All): Option[Node] = {
     if (!visible)
       return None
-      
+
     def isOver0 = {
       val m = Node.matrixes.obtain().idt()
       m.scale(1 / scaleX, 1 / scaleY, 1f)
@@ -300,7 +303,7 @@ trait Node extends Drawable with Updateable with Particle with Spatial {
       drawRect(renderer, graphic.bounds)
     }
   }
-  
+
   protected def contents(renderer: ShapeRenderer) {
     if (graphic != null) {
       renderer.setColor(1f, 0f, 0f, 1f)
@@ -314,7 +317,7 @@ trait Node extends Drawable with Updateable with Particle with Spatial {
       drawRect(renderer, clipRect)
     }
   }
-  
+
   protected def drawRect(renderer: ShapeRenderer, rect: Rectangle[Float]) {
     renderer.begin(ShapeType.Rectangle)
     renderer.rect(-originX + rect.x0, -originY + rect.y0, rect.width, rect.height)
@@ -372,16 +375,14 @@ trait Node extends Drawable with Updateable with Particle with Spatial {
 
   /** Updates this node and it's children */
   override def update(elapsed: Long @@ Milliseconds) {
-    if (controller != null) {
-      controller.foreach(ctrl => {
-        ctrl.update(elapsed)
-        if (ctrl.finished) {
-          ctrl.onEnd()
-          controller = None
-        }
-      })
-
+    for (ctrl <- controller) {
+      ctrl.update(elapsed)
+      if (ctrl.finished) {
+        ctrl.onEnd()
+        controller = None
+      }
     }
+
     updateChildren(elapsed)
   }
 
@@ -392,4 +393,9 @@ trait Node extends Drawable with Updateable with Particle with Spatial {
   }
 
   def getController = controller
+
+  /** Removes the current controller from the Node. Doesn't give a chance to the controller to finish. Use with care. */
+  def clearController() {
+    controller = None
+  }
 }
