@@ -7,8 +7,11 @@ import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.math.Vector2
 
+trait TargetPolicy {
+  def accept(target: Particle): Boolean
+}
+
 class FollowCamera(val camera: Camera) extends Updateable {
-  var target: Particle = _
   val offset = new Vector2(0.0f, 0.0f)
   var lerpCoef = 0.1f
   var minX = Float.MinValue
@@ -18,8 +21,24 @@ class FollowCamera(val camera: Camera) extends Updateable {
   var x = 0.0f
   var y = 0.0f
 
+  protected var policies: Set[TargetPolicy] = Set()
+  protected var _target: Particle = _
+  def target = _target
+  def target_=(newTarget: Particle) {
+    if (policies.forall(_.accept(newTarget))) {
+      _target = newTarget
+    }
+  }
+
+  def addTargetPolicy(policy: TargetPolicy) {
+    policies += policy
+  }
+
+  def removeTargetPolicy(policy: TargetPolicy) {
+    policies -= policy
+  }
+
   override def update(elapsed: Long @@ Milliseconds) {
-    //super.update(elapsed)
     camera.update()
 
     if (target != null) {
@@ -34,7 +53,7 @@ class FollowCamera(val camera: Camera) extends Updateable {
     y = clamp(y, minY, maxY)
     camera.position.x = x
     camera.position.y = y
-    
+
     camera.update()
   }
 
