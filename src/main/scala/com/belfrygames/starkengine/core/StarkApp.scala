@@ -98,6 +98,8 @@ class StarkApp protected (val config: Config) extends ApplicationListener with U
   }
 
   def resume() {
+    Gdx.app.log("StarkApp", "Resumed Stark App")
+    
     screen.resume()
   }
 

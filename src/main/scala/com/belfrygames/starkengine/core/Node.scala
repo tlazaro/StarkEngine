@@ -259,38 +259,37 @@ trait Node extends Drawable with Updateable with Particle with Spatial {
 
   /** Draws this node and it's children */
   override def draw(spriteBatch: SpriteBatch) {
-    if (graphic != null) {
-      var scissors: com.badlogic.gdx.math.Rectangle = null
-      val clipped = if (clipRect != null) {
-        findLayer match {
-          case Some(layer) =>
-            spriteBatch.flush()
-            scissors = Node.rectangles.obtain()
-            val clipBounds = Node.rectangles.obtain()
-            clipBounds.set(clipRect.x0 + x + xOffset - originX, clipRect.y0 + y + yOffset - originY, clipRect.width, clipRect.height)
-            ScissorStack.calculateScissors(layer.cam, spriteBatch.getTransformMatrix(), clipBounds, scissors)
-            Node.rectangles.free(clipBounds)
-            val appliedScissors = ScissorStack.pushScissors(scissors)
-            if (!appliedScissors)
-              Node.rectangles.free(scissors)
-            appliedScissors
-          case _ => false
-        }
-      } else {
-        false
+    var scissors: com.badlogic.gdx.math.Rectangle = null
+    val clipped = if (clipRect != null) {
+      findLayer match {
+        case Some(layer) =>
+          spriteBatch.flush()
+          scissors = Node.rectangles.obtain()
+          val clipBounds = Node.rectangles.obtain()
+          clipBounds.set(clipRect.x0 + x + xOffset - originX, clipRect.y0 + y + yOffset - originY, clipRect.width, clipRect.height)
+          ScissorStack.calculateScissors(layer.cam, spriteBatch.getTransformMatrix(), clipBounds, scissors)
+          Node.rectangles.free(clipBounds)
+          val appliedScissors = ScissorStack.pushScissors(scissors)
+          if (!appliedScissors)
+            Node.rectangles.free(scissors)
+          appliedScissors
+        case _ => false
       }
+    } else false
 
+    if (graphic != null) {
       setDrawingColor(spriteBatch, color)
       graphic.draw(spriteBatch, x + xOffset - originX, y + yOffset - originY, originX + xOffset, originY + yOffset, width, height, scaleX, scaleY, rotation)
 
-      if (clipped) {
-        spriteBatch.flush()
-        ScissorStack.popScissors()
-        Node.rectangles.free(scissors)
-      }
     }
 
     drawChildren(spriteBatch)
+
+    if (clipped) {
+      spriteBatch.flush()
+      ScissorStack.popScissors()
+      Node.rectangles.free(scissors)
+    }
   }
 
   protected def bounds(renderer: ShapeRenderer) {
