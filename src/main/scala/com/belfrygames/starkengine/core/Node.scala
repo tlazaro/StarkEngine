@@ -100,8 +100,30 @@ trait Node extends Drawable with Updateable with Particle with Spatial {
     }
   }
 
+  @inline private def loadClipBounds(clipBounds: com.badlogic.gdx.math.Rectangle) {
+    clipBounds.set(clipRect.x0 + x + xOffset - originX, clipRect.y0 + y + yOffset - originY, clipRect.width, clipRect.height)
+  }
+
+  private def isInsideVisibleArea(pickX: Float, pickY: Float) = {
+    if (!visible) false
+    else if (clipRect == null) true
+    else {
+      val clipBounds = Node.rectangles.obtain()
+      loadClipBounds(clipBounds)
+      val res = clipBounds.contains(pickX, pickY)
+      Node.rectangles.free(clipBounds)
+      res
+    }
+  }
+
+  private def isInsideVisibleAreaLocal(pickX: Float, pickY: Float) = {
+    if (!visible) false
+    else if (clipRect == null) true
+    else clipRect.contains(pickX, pickY)
+  }
+
   protected def isOverChildren(pickX: Float, pickY: Float, strat: OverStrategy, behavior: OverBehavior): Option[Node] = {
-    if (!visible)
+    if (!isInsideVisibleAreaLocal(pickX, pickY))
       return None
 
     for (child <- getChildren.reverse) {
@@ -114,7 +136,7 @@ trait Node extends Drawable with Updateable with Particle with Spatial {
   }
 
   def isOverLocal(pickX: Float, pickY: Float, strat: OverStrategy, behavior: OverBehavior): Option[Node] = {
-    if (!visible)
+    if (!isInsideVisibleAreaLocal(pickX, pickY))
       return None
 
     if (width <= 0 || height <= 0) {
@@ -266,7 +288,7 @@ trait Node extends Drawable with Updateable with Particle with Spatial {
           spriteBatch.flush()
           scissors = Node.rectangles.obtain()
           val clipBounds = Node.rectangles.obtain()
-          clipBounds.set(clipRect.x0 + x + xOffset - originX, clipRect.y0 + y + yOffset - originY, clipRect.width, clipRect.height)
+          loadClipBounds(clipBounds)
           ScissorStack.calculateScissors(layer.cam, spriteBatch.getTransformMatrix(), clipBounds, scissors)
           Node.rectangles.free(clipBounds)
           val appliedScissors = ScissorStack.pushScissors(scissors)
