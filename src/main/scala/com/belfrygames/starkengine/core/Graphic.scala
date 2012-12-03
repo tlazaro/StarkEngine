@@ -5,7 +5,7 @@ import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.BitmapFont
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.g2d.TextureRegion
-import com.badlogic.gdx.graphics.g2d.stbtt.TrueTypeFontFactory
+import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator
 import com.badlogic.gdx.graphics.g2d.TextureAtlas
 import com.badlogic.gdx.Gdx
 import org.lwjgl.BufferUtils
@@ -251,10 +251,7 @@ object Text {
   //  }
 
   def getFont(pixelSize: Int, charset: String = FONT_CHARACTERS): BitmapFont = {
-    val font = TrueTypeFontFactory.createBitmapFont(
-      Gdx.files.internal("com/belfrygames/starkengine/ubuntu.ttf"),
-      charset, 1024, 640, pixelSize, 1024, 640)
-
+    val font = new FreeTypeFontGenerator(Gdx.files.internal("com/belfrygames/starkengine/ubuntu.ttf")).generateFont(pixelSize)
     font.setUseIntegerPositions(false)
     font
   }
@@ -267,8 +264,7 @@ trait Font extends Graphic[BitmapFont] {
 }
 
 class TrueTypeFont(val path: String, val pixelSize: Int, val charset: String = Text.FONT_CHARACTERS) extends Font {
-  val bitmapFont = TrueTypeFontFactory.createBitmapFont(
-      Gdx.files.internal(path), charset, 1024, 640, pixelSize, 1024, 640) // TODO windows size dependency
+  val bitmapFont = new FreeTypeFontGenerator(Gdx.files.internal(path)).generateFont(pixelSize)
   bitmapFont.setUseIntegerPositions(false)
 
   override def newFont(pixelSize: Int, charset: String = Text.FONT_CHARACTERS) = new TrueTypeFont(path, pixelSize, charset)
@@ -294,7 +290,7 @@ class TrueTypeFont(val path: String, val pixelSize: Int, val charset: String = T
     if (primitive != null) {
       primitive.setScale(scaleX, scaleY)
       val textx = x + centerX - scaleX * centerX
-      val texty = y + centerY - scaleY * centerY + height * scaleY - primitive.getLineHeight
+      val texty = y + centerY - scaleY * centerY + height * scaleY //- primitive.getLineHeight
       primitive.drawMultiLine(spriteBatch, text, textx, texty)
     }
   }

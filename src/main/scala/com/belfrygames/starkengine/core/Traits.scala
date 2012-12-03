@@ -112,8 +112,8 @@ trait Spatial {
 }
 
 trait Drawable {  
-  var xOffset = 0
-  var yOffset = 0
+  var xOffset = 0f
+  var yOffset = 0f
   var visible = true
   var selected = false
   

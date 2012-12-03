@@ -158,7 +158,7 @@ trait Node extends Drawable with Updateable with Particle with Spatial {
 
     def isOver0 = {
       val m = Node.matrixes.obtain().idt()
-      m.scale(1 / scaleX, 1 / scaleY, 1f)
+      m.scale(1f / scaleX, 1f / scaleY, 1f)
       m.rotate(0, 0, 1f, -rotation)
       m.translate(-(x + xOffset), -(y + yOffset), 0f)
 

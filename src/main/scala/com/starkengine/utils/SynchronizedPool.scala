@@ -27,8 +27,8 @@ trait SynchronizedPool[T] extends Pool[T] {
    * Puts the specified objects in the pool.
    * @see #free(Object)
    */
-  abstract override def free(objects: com.badlogic.gdx.utils.Array[T]) = synchronized {
-    super.free(objects)
+  abstract override def freeAll(objects: com.badlogic.gdx.utils.Array[T]) = synchronized {
+    super.freeAll(objects)
   }
 
   /** Removes all free objects from this pool. */
