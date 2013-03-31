@@ -13,10 +13,12 @@ import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.math.Vector3
 import scala.collection.mutable.ArrayBuffer
 import com.badlogic.gdx.graphics.Camera
+import com.badlogic.gdx.graphics.Color
 
 object Screen {
   var DEBUG = false
-  var SHOW_KEYS = false
+
+  val smallFont = Style(new TrueTypeFont("com/belfrygames/starkengine/ubuntu.ttf", 15), new Color(1, 1, 1, 1))
 }
 
 class Screen extends Node with Timed {
@@ -46,6 +48,14 @@ class Screen extends Node with Timed {
 
   lazy val foreground = new Layer(cam)
   lazy val hud: Layer = new Layer(hudCam)
+  lazy val debug: Layer = new Layer(hudCam)
+
+  // Debug labels
+  private lazy val fps = new Label("FPS:", smallFont)
+  private lazy val policy = new Label("Resize Policy: ", smallFont)
+  private lazy val location = new Label("Location: ", smallFont)
+  private lazy val mouse = new Label("Mouse: ", smallFont)
+  private lazy val debugText = List(fps, policy, location, mouse)
 
   /** Called by StarkApp when it sets this as current screen */
   def register() {
@@ -60,6 +70,18 @@ class Screen extends Node with Timed {
 
     add(foreground, "foreground")
     add(hud, "hud")
+    add(debug, "debug")
+
+    for ((label, n) <- debugText.zipWithIndex) {
+      debug.add(label, "label" + n)
+      label.debugVisible = false
+      label.visible = false
+    }
+
+    debugText.reverse.foldLeft(5f)((pos, label) => {
+      label.setPos(10f, pos)
+      label.y + label.height * 1.3f
+    })
 
     cam.position.set(0, 0, 0)
     followCam.update(tag(0))
@@ -93,10 +115,10 @@ class Screen extends Node with Timed {
     vec.z = 0
     if (camera == null) {
       vec.y = Gdx.graphics.getHeight - vec.y // Fix inverted Y-Axis
-      vec 
+      vec
     } else {
-     camera.unproject(vec)
-     vec
+      camera.unproject(vec)
+      vec
     }
   }
 
@@ -142,7 +164,7 @@ class Screen extends Node with Timed {
   }
 
   def draw() {
-    Gdx.gl.glViewport((Gdx.graphics.getWidth - targetWidth) / 2, (Gdx.graphics.getHeight - targetHeight) / 2, targetWidth, targetHeight)
+    Gdx.gl.glViewport(((Gdx.graphics.getWidth - targetWidth) / 2f).round, ((Gdx.graphics.getHeight - targetHeight) / 2f).round, targetWidth, targetHeight)
 
     spriteBatch.begin()
     draw(spriteBatch)
@@ -153,37 +175,7 @@ class Screen extends Node with Timed {
     }
 
     Gdx.gl.glViewport(0, 0, Gdx.graphics.getWidth, Gdx.graphics.getHeight)
-
-    if (SHOW_KEYS || DEBUG) {
-      spriteBatch.begin()
-      if (SHOW_KEYS) {
-        for ((text, line) <- keys) {
-          font.draw(spriteBatch, text, 20, Gdx.graphics.getHeight - ((line + 2) * 20))
-        }
-      }
-      if (DEBUG) {
-        font.draw(spriteBatch, "FPS: " + Gdx.graphics.getFramesPerSecond(), 20, 20)
-        font.draw(spriteBatch, "Resize Policy: " + app.resizePolicy.getClass.getSimpleName, 20, 40)
-        tmp.set(0, 0, 0)
-        cam.unproject(tmp)
-        font.draw(spriteBatch, "Location: " + cam.position.x + "," + cam.position.y, 20, 60)
-        font.draw(spriteBatch, "Mouse: " + Gdx.input.getX() + "," + Gdx.input.getY(), 20, 80)
-      }
-      spriteBatch.end()
-    }
   }
-
-  private[this] val keys = """Keys:
-- Tab : Toggle Debug info
-- F1 : Toggle Keys help
-- F2 : Screen: FitScreen
-- F3 : Screen: Original
-- F4 : Screen: Stretch
-- F5 : Screen: Original Canvas
-- Arrows or WASD: Move
-- X or Space: Action
-- +/- Zoom in/out
-- Esc : Exit""".split("\n").view.zipWithIndex.toList
 
   def resume() {}
   def resize(width: Int, height: Int) {
@@ -208,6 +200,19 @@ class Screen extends Node with Timed {
 
   def pause() {}
   def dispose() {}
+
+  override def update(elapsed: Long @@ Milliseconds) {
+    super.update(elapsed)
+
+    debug.visible = DEBUG
+    if (DEBUG) {
+      fps.text = "FPS: " + Gdx.graphics.getFramesPerSecond()
+      policy.text = "Resize Policy: " + app.resizePolicy.getClass.getSimpleName
+      location.text = "Location: " + screenToViewPortX(cam.position.x) + "," + screenToViewPortX(cam.position.y)
+      screenToCanvas(Gdx.input.getX(), Gdx.input.getY(), tmp, hudCam)
+      mouse.text = "Mouse: " + tmp.x.round + "," + tmp.y.round
+    }
+  }
 }
 
 class ScreenDebugKeysController extends InputAdapter {
@@ -215,8 +220,8 @@ class ScreenDebugKeysController extends InputAdapter {
 
   override def keyUp(keycode: Int): Boolean = {
     keycode match {
-//      case TAB => Screen.DEBUG = !Screen.DEBUG
-//      case F1 => Screen.SHOW_KEYS = !Screen.SHOW_KEYS
+      //      case TAB => Screen.DEBUG = !Screen.DEBUG
+      //      case F1 => Screen.SHOW_KEYS = !Screen.SHOW_KEYS
       case _ =>
     }
 

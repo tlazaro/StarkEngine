@@ -15,10 +15,10 @@ import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.GL10
 
 object Node {
-  val matrixes = new Pool[Matrix4](10) with SynchronizedPool[Matrix4] {
+  val matrixes = new Pool[Matrix4](15) with SynchronizedPool[Matrix4] {
     override protected def newObject() = new Matrix4()
   }
-  val vectors = new Pool[Vector3](10) with SynchronizedPool[Vector3] {
+  val vectors = new Pool[Vector3](15) with SynchronizedPool[Vector3] {
     override protected def newObject() = new Vector3()
   }
   val rectangles = new Pool[com.badlogic.gdx.math.Rectangle](10) with SynchronizedPool[com.badlogic.gdx.math.Rectangle] {

@@ -116,6 +116,7 @@ trait Drawable {
   var yOffset = 0f
   var visible = true
   var selected = false
+  var debugVisible = true
   
   final def redraw (spriteBatch : SpriteBatch) {
     if (visible) {
@@ -124,7 +125,7 @@ trait Drawable {
   }
   
   final def debugRedraw(renderer: ShapeRenderer) {
-    if (visible) {
+    if (visible && debugVisible) {
       debugDraw(renderer)
     }
   }

@@ -49,8 +49,8 @@ class FollowCamera(val camera: Camera) extends Updateable {
       y = camera.position.y
     }
 
-    x = clamp(x, minX, maxX)
-    y = clamp(y, minY, maxY)
+    x = clamp(x.round, minX, maxX)
+    y = clamp(y.round, minY, maxY)
     camera.position.x = x
     camera.position.y = y
 

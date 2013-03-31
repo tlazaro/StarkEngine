@@ -1,20 +1,25 @@
 import sbt._, Keys._, Path._
+import eu.diversit.sbt.plugin.WebDavPlugin._
 
 object ProjectDefinition extends Build {
   lazy val root = Project("StarkEngine", file(".")) settings(publishSettings ++ Seq(
       libraryDependencies ++= Seq(
-        "org.scalatest" %% "scalatest" % "1.8" % "test"
+        "org.scalatest" %% "scalatest" % "1.9.1" % "test"
       ),
-      fork in test := true
+      fork in test := true,
+      scalaVersion := "2.9.2",
+      crossScalaVersions := Seq("2.9.2", "2.10.0", "2.10.1")
     ) :_*)
 
-  lazy val publishSettings = Seq[Project.Setting[_]](
-    version := "0.1-SNAPSHOT",
+  lazy val publishSettings = aether.Aether.aetherSettings ++ WebDav.scopedSettings ++ Seq[Project.Setting[_]](
+    organization := "com.starkengine",
+    name := "starkengine",
+    version := "0.1",
     publishMavenStyle := true,
     publishTo <<= (version) {
       version: String =>
       val cloudbees = "https://repository-belfry.forge.cloudbees.com/"
-      if (version.trim.endsWith("SNAPSHOT")) Some("snapshot" at cloudbees + "snapshot/") 
+      if (version.trim.endsWith("SNAPSHOT")) Some("snapshot" at cloudbees + "snapshot/")
       else                                   Some("release"  at cloudbees + "release/")
     },
     credentials += {

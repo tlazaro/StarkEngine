@@ -25,8 +25,8 @@ case class Rectangle[@specialized A: Numeric](x0: A, y0: A, x1: A, y1: A) {
     val x = num.plus(x0, x1)
     val y = num.plus(y0, y1)
     num match {
-      case f: Fractional[_] => Point2D(f.div(x, two), f.div(y, two))
-      case i: Integral[_] => Point2D(i.quot(x, two), i.quot(y, two))
+      case f: Fractional[A] => Point2D(f.div(x, two), f.div(y, two))
+      case i: Integral[A] => Point2D(i.quot(x, two), i.quot(y, two))
       case _ => sys.error("Undivisable numeric!")
     }
   }

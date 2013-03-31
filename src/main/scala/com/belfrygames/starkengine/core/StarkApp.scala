@@ -106,9 +106,9 @@ class StarkApp protected (val config: Config) extends ApplicationListener with U
   def resize(width: Int, height: Int) {
     val (tWidth, tHeight) = resizePolicy match {
       case FitScreen => if (width.toFloat / height >= config.width.toFloat / config.height) {
-        (height * config.width / config.height, height)
+        ((height.toFloat * config.width / config.height).round, height)
       } else {
-        (width, width * config.height / config.width)
+        (width, (width.toFloat * config.height / config.width).round)
       }
       case Stretch => (width, height)
       case Original => (config.width, config.height)
