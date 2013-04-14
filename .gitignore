@@ -22,4 +22,6 @@ target/
 /nbproject/private/
 /build/
 
-
+# IntelliJ
+.idea
+.idea_modules
