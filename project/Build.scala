@@ -1,17 +1,21 @@
 import sbt._, Keys._, Path._
-import eu.diversit.sbt.plugin.WebDavPlugin._
+
+//import eu.diversit.sbt.plugin.WebDavPlugin._
 
 object ProjectDefinition extends Build {
-  lazy val root = Project("StarkEngine", file(".")) settings(publishSettings ++ Seq(
-      libraryDependencies ++= Seq(
-        "org.scalatest" %% "scalatest" % "1.9.1" % "test"
-      ),
-      fork in test := true,
-      scalaVersion := "2.9.2",
-      crossScalaVersions := Seq("2.9.2", "2.10.0", "2.10.1")
-    ) :_*)
+  lazy val root = Project("StarkEngine", file(".")) settings (Seq(
+    organization := "com.starkengine",
+    name := "starkengine",
+    version := "0.1.1",
+    libraryDependencies ++= Seq(
+      "org.scalatest" %% "scalatest" % "1.9.1" % "test"
+    ),
+    fork in test := true,
+    scalaVersion := "2.10.4",
+    crossScalaVersions := Seq("2.9.3", "2.10.4")
+  ): _*)
 
-  lazy val publishSettings = aether.Aether.aetherSettings ++ WebDav.scopedSettings ++ Seq[Project.Setting[_]](
+  /*lazy val publishSettings = aether.Aether.aetherSettings ++ WebDav.scopedSettings ++ Seq[Project.Setting[_]](
     organization := "com.starkengine",
     name := "starkengine",
     version := "0.1",
@@ -27,5 +31,5 @@ object ProjectDefinition extends Build {
       (if (credsFile.exists) Credentials(credsFile)
        else Credentials(file("/private/belfry/.credentials/.credentials")))
     }
-  )
+  )*/
 }
