@@ -24,6 +24,8 @@ case class Point2D[@specialized A: Numeric](x: A, y: A) {
   @inline def toLong: Point2D[Long] = Point2D(num.toLong(x), num.toLong(y))
 
   @inline def inside(r: Rectangle[A]): Boolean = r contains this
+
+  @inline def unapply(): Option[(A, A)] = Some((x, y))
 }
 
 case class Point3D[@specialized A: Numeric](x: A, y: A, z: A) {
@@ -41,4 +43,6 @@ case class Point3D[@specialized A: Numeric](x: A, y: A, z: A) {
   @inline def toDouble: Point3D[Double] = Point3D(num.toDouble(x), num.toDouble(y), num.toDouble(z))
   @inline def toInt: Point3D[Int] = Point3D(num.toInt(x), num.toInt(y), num.toInt(z))
   @inline def toLong: Point3D[Long] = Point3D(num.toLong(x), num.toLong(y), num.toLong(z))
+
+  @inline def unapply(): Option[(A, A, A)] = Some((x, y, z))
 }
