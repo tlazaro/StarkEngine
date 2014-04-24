@@ -3,11 +3,19 @@ import sbt._, Keys._, Path._
 //import eu.diversit.sbt.plugin.WebDavPlugin._
 
 object ProjectDefinition extends Build {
+  val gdxVersion = "1.0.0"
+
   lazy val root = Project("StarkEngine", file(".")) settings (Seq(
     organization := "com.starkengine",
     name := "starkengine",
-    version := "0.1.1",
+    version := "0.2.0",
+    resolvers += Resolver.sonatypeRepo("releases"),
     libraryDependencies ++= Seq(
+      "com.badlogicgames.gdx" % "gdx" % gdxVersion,
+      "com.badlogicgames.gdx" % "gdx-backend-lwjgl" % gdxVersion,
+      "com.badlogicgames.gdx" % "gdx-platform" % gdxVersion % "test" classifier "natives-desktop",
+      "com.badlogicgames.gdx" % "gdx-freetype" % gdxVersion,
+      "com.badlogicgames.gdx" % "gdx-freetype-platform" % gdxVersion % "test" classifier "natives-desktop",
       "org.scalatest" %% "scalatest" % "1.9.1" % "test"
     ),
     fork in test := true,

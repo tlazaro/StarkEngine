@@ -153,22 +153,22 @@ object Resources {
 
   class TextParameter extends AssetLoaderParameters[String]
   class TextLoader(resolver: FileHandleResolver) extends SynchronousAssetLoader[String, TextParameter](resolver) {
-    override def load(manager: AssetManager, fileName: String, parameter: TextParameter): String = {
+    override def load(manager: AssetManager, fileName: String, file: FileHandle, parameter: TextParameter): String = {
       Source.fromInputStream(resolve(fileName).read).mkString
     }
-    
-    override def getDependencies(fileName: String, parameter: TextParameter): com.badlogic.gdx.utils.Array[AssetDescriptor[_]] = {
+
+    override def getDependencies(fileName: String, file: FileHandle, parameter: TextParameter): com.badlogic.gdx.utils.Array[AssetDescriptor[_]] = {
       null
     }
   }
   
   class TextureAtlasParameter extends AssetLoaderParameters[TextureAtlas]
   class TextureAtlasLoader(resolver: FileHandleResolver) extends SynchronousAssetLoader[TextureAtlas, TextureAtlasParameter](resolver) {
-    override def load(manager: AssetManager, fileName: String, parameter: TextureAtlasParameter): TextureAtlas = {
+    override def load(manager: AssetManager, fileName: String, file: FileHandle, parameter: TextureAtlasParameter): TextureAtlas = {
       new TextureAtlas(resolve(fileName))
     }
     
-    override def getDependencies(fileName: String, parameter: TextureAtlasParameter): com.badlogic.gdx.utils.Array[AssetDescriptor[_]] = {
+    override def getDependencies(fileName: String, file: FileHandle, parameter: TextureAtlasParameter): com.badlogic.gdx.utils.Array[AssetDescriptor[_]] = {
       null
     }
   }

@@ -11,8 +11,8 @@ class StarkAppTest extends FunSuite {
   
   test("Main Application Works") {
     val config = new LwjglApplicationConfiguration
-    config.useGL20 = true
-    
+    config.useGL30 = true
+
     // Get the default toolkit
     val scrnsize = if (FULLSCREEN) {
       val toolkit = Toolkit.getDefaultToolkit()
@@ -26,7 +26,7 @@ class StarkAppTest extends FunSuite {
     
     config.title = "Application Test"
     config.fullscreen = FULLSCREEN
-    config.useCPUSynch = false
+    config.vSyncEnabled = true
     
     val resources = new Resources() {
       def initialize() {
@@ -39,6 +39,6 @@ class StarkAppTest extends FunSuite {
     
     val app = new LwjglApplication(AppTest(new Config(resources, new ScreenTest())), config)
 
-//    Thread.sleep(20000)
+    Thread.sleep(20000)
   }
 }

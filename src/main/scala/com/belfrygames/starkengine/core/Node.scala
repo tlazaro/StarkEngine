@@ -7,12 +7,9 @@ import com.badlogic.gdx.math.Matrix4
 import com.badlogic.gdx.math.Vector3
 import com.badlogic.gdx.utils.Pool
 import com.belfrygames.starkengine.tags._
-import com.belfrygames.starkengine.utils._
 import com.starkengine.utils.SynchronizedPool
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.scenes.scene2d.utils.ScissorStack
-import com.badlogic.gdx.Gdx
-import com.badlogic.gdx.graphics.GL10
 
 object Node {
   val matrixes = new Pool[Matrix4](15) with SynchronizedPool[Matrix4] {
@@ -340,14 +337,14 @@ trait Node extends Drawable with Updateable with Particle with Spatial {
   }
 
   protected def drawRect(renderer: ShapeRenderer, rect: Rectangle[Float]) {
-    renderer.begin(ShapeType.Rectangle)
+    renderer.begin(ShapeType.Line)
     renderer.rect(-originX + rect.x0, -originY + rect.y0, rect.width, rect.height)
     renderer.end()
   }
 
   override def debugDraw(renderer: ShapeRenderer) {
     def drawRect(rect: Rectangle[Float]) {
-      renderer.begin(ShapeType.Rectangle)
+      renderer.begin(ShapeType.Line)
       renderer.rect(-originX + rect.x0, -originY + rect.y0, rect.width, rect.height)
       renderer.end()
     }
