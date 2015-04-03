@@ -1,0 +1,4 @@
+-Dsbt.log.format=true 
+-Dfile.encoding=UTF8
+-Dsbt.override.build.repos=false
+-Dsbt.repository.config=empty

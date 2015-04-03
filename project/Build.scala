@@ -3,7 +3,7 @@ import sbt._, Keys._, Path._
 //import eu.diversit.sbt.plugin.WebDavPlugin._
 
 object ProjectDefinition extends Build {
-  val gdxVersion = "1.0.0"
+  val gdxVersion = "1.5.5"
 
   lazy val root = Project("StarkEngine", file(".")) settings (Seq(
     organization := "com.starkengine",
@@ -11,16 +11,16 @@ object ProjectDefinition extends Build {
     version := "0.2.0",
     resolvers += Resolver.sonatypeRepo("releases"),
     libraryDependencies ++= Seq(
+      "org.scala-lang.modules" %% "scala-parser-combinators" % "1.0.3",
       "com.badlogicgames.gdx" % "gdx" % gdxVersion,
       "com.badlogicgames.gdx" % "gdx-backend-lwjgl" % gdxVersion,
       "com.badlogicgames.gdx" % "gdx-platform" % gdxVersion % "test" classifier "natives-desktop",
       "com.badlogicgames.gdx" % "gdx-freetype" % gdxVersion,
       "com.badlogicgames.gdx" % "gdx-freetype-platform" % gdxVersion % "test" classifier "natives-desktop",
-      "org.scalatest" %% "scalatest" % "1.9.1" % "test"
+      "org.scalatest" %% "scalatest" % "2.2.4" % "test"
     ),
     fork in test := true,
-    scalaVersion := "2.10.4",
-    crossScalaVersions := Seq("2.9.3", "2.10.4")
+    scalaVersion := "2.11.6"
   ): _*)
 
   /*lazy val publishSettings = aether.Aether.aetherSettings ++ WebDav.scopedSettings ++ Seq[Project.Setting[_]](
